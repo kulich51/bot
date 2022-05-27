@@ -5,10 +5,13 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import pro.sky.bot.keyboard.InfoKeyboard;
+import pro.sky.bot.service.NewUserConsultationService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -19,9 +22,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
     private final TelegramBot telegramBot;
+    private final NewUserConsultationService newUserConsultationService;
 
-    public TelegramBotUpdatesListener(TelegramBot telegramBot) {
+    public TelegramBotUpdatesListener(TelegramBot telegramBot, NewUserConsultationService newUserConsultationService) {
         this.telegramBot = telegramBot;
+        this.newUserConsultationService = newUserConsultationService;
     }
 
     @PostConstruct
@@ -33,15 +38,23 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
-            if (update.message().text().equals("/start")) {
-                String startMessage = "Мы приют домашних живтоных. Здесь вы можете взять животное из нашего приюта.\n\n" +
-                        "Для взаимодействия вы можете использвать следующие команды:\n" +
-                        "/start - перейти к стартовому сообщению\n" +
-                        "/shelter_info - узнать информацию о приюте\n" +
-                        "/take_pet - взять животное из приюта\n" +
-                        "/volunteer - позвать волонтера для общения";
 
-                telegramBot.execute(sendTextMessage(update.message(), startMessage));
+            String userMessage = update.message().text();
+//            String userMessage = "update.message().text()";
+            Long chatId = update.message().chat().id();
+            switch (userMessage) {
+                case ("/start"):
+                case ("/shelter_info"):
+                case (InfoKeyboard.ABOUT_BUTTON):
+                case (InfoKeyboard.SCHEDULE_BUTTON):
+                case (InfoKeyboard.RULES_BUTTON):
+                case (InfoKeyboard.ADD_CONTACT_BUTTON):
+                case (InfoKeyboard.CALL_VOLUNTEER_BUTTON):
+                    BaseRequest request = newUserConsultationService.parse(chatId, userMessage);
+                    telegramBot.execute(request);
+                    break;
+                default:
+                    telegramBot.execute(sendTextMessage(update.message(), "Sorry. Try again"));
             }
         });
 
