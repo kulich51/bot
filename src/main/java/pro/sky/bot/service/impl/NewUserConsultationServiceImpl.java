@@ -23,7 +23,7 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
 
 
     @Override
-    public BaseRequest parse(Long chatId, String userMessage) {
+    public SendMessage parse(Long chatId, String userMessage) {
         switch (userMessage) {
             case (START_URL):
                 return sendMessage(chatId, START_MESSAGE);
