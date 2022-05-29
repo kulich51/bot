@@ -1,48 +1,40 @@
 package pro.sky.bot.model;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collections;
 
 public class Shelter {
 
-    private String name = "Petsitters";
-    private String schedule = "понедельник - пятница";
-    private String address = "ул. Заславская 17, Минск";
-    private String coordinates = "27.538223, 53.909286";
+    private final String name = "Petsitters";
+    private final String schedule = "Круглосуточно";
+    private final String address = "ул. Заславская 17, Минск";
+    private final String coordinates = "27.538223,53.909286";
+    private final String rulesPath = "src/main/resources/rules.txt";
 
-    private String rules;
-
-    @Value("${rules.text.path}")
-    private String rulesPath;
-
-    public Shelter() throws IOException {
-
-        rules = getRulesFromFile();
+    public String getName() {
+        return name;
     }
 
-    private String getRulesFromFile() throws IOException {
-
-        BufferedReader br = new BufferedReader(new FileReader(rulesPath));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            return sb.toString();
-        } finally {
-            br.close();
-        }
+    public String getSchedule() {
+        return schedule;
     }
 
-    public String getRules() {
-        return rules;
+    public String getAddress() {
+        return address;
+    }
+
+    public String getCoordinates() {
+        return coordinates;
+    }
+
+    public String getRulesPath() {
+        return rulesPath;
     }
 }
