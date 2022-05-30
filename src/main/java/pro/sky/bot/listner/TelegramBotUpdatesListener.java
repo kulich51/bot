@@ -14,6 +14,7 @@ import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.service.NewUserConsultationService;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -50,7 +51,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 case (InfoKeyboard.RULES_BUTTON):
                 case (InfoKeyboard.ADD_CONTACT_BUTTON):
                 case (InfoKeyboard.CALL_VOLUNTEER_BUTTON):
-                    BaseRequest request = newUserConsultationService.parse(chatId, userMessage);
+                    BaseRequest request = null;
+                    try {
+                        request = newUserConsultationService.parse(chatId, userMessage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     telegramBot.execute(request);
                     break;
                 default:

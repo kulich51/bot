@@ -1,9 +1,10 @@
 package pro.sky.bot.service;
 
 import com.pengrad.telegrambot.request.BaseRequest;
-import com.pengrad.telegrambot.request.SendMessage;
+
+import java.io.IOException;
 
 public interface NewUserConsultationService {
 
-    SendMessage parse(Long chatId, String url);
+    BaseRequest parse(Long chatId, String url) throws IOException;
 }
