@@ -2,6 +2,7 @@ package pro.sky.bot.listner;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Contact;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -40,6 +41,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
 
+            // Проверка поделился ли пользователем контактом
+            if (addContact(update)) {
+                return;
+            }
+
             String userMessage = update.message().text();
 //            String userMessage = "update.message().text()";
             Long chatId = update.message().chat().id();
@@ -49,7 +55,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 case (InfoKeyboard.ABOUT_BUTTON):
                 case (InfoKeyboard.SCHEDULE_BUTTON):
                 case (InfoKeyboard.RULES_BUTTON):
-                case (InfoKeyboard.ADD_CONTACT_BUTTON):
                 case (InfoKeyboard.CALL_VOLUNTEER_BUTTON):
                     BaseRequest request = null;
                     try {
@@ -65,6 +70,16 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         });
 
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
+    }
+
+    private boolean addContact(Update update) {
+        Contact contact = update.message().contact();
+        if (contact != null) {
+            // Здесь логика по добавлению контакта в репозиторий
+            // И потом можно написать сообщение, что контакт записан
+            return true;
+        }
+        return false;
     }
 
     private SendMessage sendTextMessage(Message userMessage, String message) {
