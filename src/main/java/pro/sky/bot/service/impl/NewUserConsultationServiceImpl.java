@@ -1,6 +1,5 @@
 package pro.sky.bot.service.impl;
 
-import com.pengrad.telegrambot.model.request.*;
 import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.model.Shelter;
-import pro.sky.bot.service.NewUserConsultationService;
+import pro.sky.bot.service.ConsultationService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,7 +16,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Service
-public class NewUserConsultationServiceImpl implements NewUserConsultationService {
+public class NewUserConsultationServiceImpl extends MessageSender implements ConsultationService {
 
     private final String START_MESSAGE = "Мы приют домашних живтоных. Здесь вы можете взять животное из нашего приюта.\n\n" +
                         "Для взаимодействия вы можете использвать следующие команды:\n" +
@@ -45,7 +44,7 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
             case (InfoKeyboard.RULES_BUTTON):
                 return getRulesFromFile(chatId, shelter.getRulesPath());
             default:
-                return sendMessage(chatId, "Непредвиденная ошибка");
+                return sendDefaultMessage(chatId);
         }
     }
 
@@ -93,30 +92,5 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
         }
     }
 
-    /**
-     * Send text message to user
-     * @param chatId chat identifier in telegram
-     * @param message text message for user
-     * @return telegram SendMessage object
-     */
-    private SendMessage sendMessage(Long chatId, String message) {
 
-        return new SendMessage(chatId, message)
-                .parseMode(ParseMode.HTML)
-                .disableWebPagePreview(true)
-                .disableNotification(true);
-    }
-
-    /**
-     * Send text message to user and show keyboard
-     * @param chatId chat identifier in telegram
-     * @param message text message for user
-     * @param keyboard keyboard object to show
-     * @return telegram SendMessage object
-     */
-    private SendMessage sendMessage(Long chatId, String message, Keyboard keyboard) {
-
-        return sendMessage(chatId, message)
-                .replyMarkup(keyboard);
-    }
 }
