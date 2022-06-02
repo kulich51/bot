@@ -44,6 +44,8 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
                 return new SendPhoto(chatId, getMapByCoordinates(shelter.getCoordinates()));
             case (InfoKeyboard.RULES_BUTTON):
                 return getRulesFromFile(chatId, shelter.getRulesPath());
+            case (InfoKeyboard.ABOUT_BUTTON):
+                return getRulesFromFile(chatId, shelter.getShelterInfoPath());
             default:
                 return sendMessage(chatId, "Непредвиденная ошибка");
         }
@@ -76,6 +78,24 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
      * @throws IOException
      */
     private SendMessage getRulesFromFile(Long chatId, String path) throws IOException {
+
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            return sendMessage(chatId, sb.toString());
+        } finally {
+            br.close();
+        }
+    }
+
+    private SendMessage getShelterInfo(Long chatId, String path) throws IOException {
 
         BufferedReader br = new BufferedReader(new FileReader(path));
         try {
