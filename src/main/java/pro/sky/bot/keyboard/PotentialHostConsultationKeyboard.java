@@ -11,7 +11,7 @@ public class PotentialHostConsultationKeyboard {
     public static final String RULES_OF_ACQUAINTANCE = "Правила знакомства с собакой";
     public static final String RECOMMENDATIONS = "Рекомендации";
     public static final String CYNOLOGIST = "Информация по кинологам";
-    public static final String LIST_OF_DOCUMENTS = "Необходимы перечень документов";
+    public static final String LIST_OF_DOCUMENTS = "Необходимый перечень документов";
 
     private PotentialHostConsultationKeyboard() {
     }

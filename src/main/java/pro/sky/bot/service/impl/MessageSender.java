@@ -3,8 +3,17 @@ package pro.sky.bot.service.impl;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class MessageSender {
+
+    @Value("${text.files.path}")
+    private String textFilesDirectory;
 
     /**
      * Send text message to user
@@ -37,5 +46,24 @@ public class MessageSender {
 
         String message = "Sorry, try again!";
         return sendMessage(chatId, message);
+    }
+
+    protected SendMessage sendMessageFromTextFile(Long chatId, String fileName) throws IOException {
+
+        String path = textFilesDirectory.concat(fileName);
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            return sendMessage(chatId, sb.toString());
+        } finally {
+            br.close();
+        }
     }
 }

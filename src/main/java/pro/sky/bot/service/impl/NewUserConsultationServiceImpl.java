@@ -42,7 +42,7 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
             case (InfoKeyboard.SCHEDULE_BUTTON):
                 return new SendPhoto(chatId, getMapByCoordinates(shelter.getCoordinates()));
             case (InfoKeyboard.RULES_BUTTON):
-                return getRulesFromFile(chatId, shelter.getRulesPath());
+                return sendMessageFromTextFile(chatId, "rules.txt");
             default:
                 return sendDefaultMessage(chatId);
         }
@@ -66,31 +66,4 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
         ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, byte[].class);
         return response.getBody();
     }
-
-    /**
-     * Get rules from text file
-     * @param chatId chat identifier in telegram
-     * @param path path of text file with rules
-     * @return telegram SendMessage object
-     * @throws IOException
-     */
-    private SendMessage getRulesFromFile(Long chatId, String path) throws IOException {
-
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            return sendMessage(chatId, sb.toString());
-        } finally {
-            br.close();
-        }
-    }
-
-
 }

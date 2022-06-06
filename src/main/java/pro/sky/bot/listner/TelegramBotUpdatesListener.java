@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.InfoKeyboard;
+import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
 import pro.sky.bot.service.ConsultationService;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
 import pro.sky.bot.service.impl.PotentialHostConsultationServiceImpl;
@@ -66,6 +67,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 parseUserMessage(chatId, userMessage, newUserConsultationService);
                 break;
             case ("/take_pet"):
+            case (PotentialHostConsultationKeyboard.RULES_OF_ACQUAINTANCE):
+            case (PotentialHostConsultationKeyboard.LIST_OF_DOCUMENTS):
                 parseUserMessage(chatId, userMessage, potentialHostConsultationService);
                 break;
             default:
