@@ -16,7 +16,7 @@ public class Shelter {
     private final String schedule = "Круглосуточно";
     private final String address = "ул. Заславская 17, Минск";
     private final String coordinates = "27.538223,53.909286";
-    private final String rulesPath = "src/main/resources/rules.txt";
+    private final String rulesPath = "src/main/resources/text/rules.txt";
 
     public String getName() {
         return name;

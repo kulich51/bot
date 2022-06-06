@@ -4,7 +4,7 @@ import com.pengrad.telegrambot.request.BaseRequest;
 
 import java.io.IOException;
 
-public interface NewUserConsultationService {
+public interface ConsultationService {
 
     BaseRequest parse(Long chatId, String url) throws IOException;
 }
