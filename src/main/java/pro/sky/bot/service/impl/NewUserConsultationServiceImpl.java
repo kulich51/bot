@@ -43,6 +43,8 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
                 return new SendPhoto(chatId, getMapByCoordinates(shelter.getCoordinates()));
             case (InfoKeyboard.RULES_BUTTON):
                 return sendMessageFromTextFile(chatId, "rules.txt");
+            case (InfoKeyboard.ABOUT_BUTTON):
+                return getRulesFromFile(chatId, shelter.getShelterInfoPath());
             default:
                 return sendDefaultMessage(chatId);
         }
