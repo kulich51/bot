@@ -3,7 +3,6 @@ package pro.sky.bot.listner;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Contact;
-import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.BaseRequest;
@@ -12,14 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.InfoKeyboard;
-import pro.sky.bot.repository.VolunteerRepository;
-import pro.sky.bot.service.NewUserConsultationService;
 import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
+import pro.sky.bot.model.DatabaseContact;
+import pro.sky.bot.repository.ContactRepository;
 import pro.sky.bot.service.ConsultationService;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
 import pro.sky.bot.service.impl.PotentialHostConsultationServiceImpl;
 
 import javax.annotation.PostConstruct;
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,19 +29,19 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
     private final TelegramBot telegramBot;
-    private final NewUserConsultationService newUserConsultationService;
-    private final VolunteerRepository volunteerRepository;
+    private final NewUserConsultationServiceImpl newUserConsultationService;
     private final PotentialHostConsultationServiceImpl potentialHostConsultationService;
+    private final ContactRepository contactRepository;
 
     public TelegramBotUpdatesListener(
       TelegramBot telegramBot,
-      NewUserConsultationService newUserConsultationService,
-      VolunteerRepository volunteerRepository,
-      PotentialHostConsultationServiceImpl potentialHostConsultationService) {
+      NewUserConsultationServiceImpl newUserConsultationService,
+      PotentialHostConsultationServiceImpl potentialHostConsultationService,
+      ContactRepository contactRepository) {
         this.telegramBot = telegramBot;
         this.newUserConsultationService = newUserConsultationService;
-        this.volunteerRepository = volunteerRepository;
-        this.potentialHostConsultationService = potentialHostConsultationService
+        this.potentialHostConsultationService = potentialHostConsultationService;
+        this.contactRepository = contactRepository;
     }
 
     @PostConstruct
@@ -64,12 +64,25 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     private boolean addContact(Update update) {
+
         Contact contact = update.message().contact();
+
         if (contact != null) {
+            contactRepository.save(createDatabaseContact(contact));
             telegramBot.execute(sendTextMessage(update.message().chat().id(), "Ваш контакт добавлен"));
             return true;
         }
         return false;
+    }
+
+    private DatabaseContact createDatabaseContact(Contact contact) {
+        return new DatabaseContact(
+                1L,
+                contact.phoneNumber(),
+                contact.firstName(),
+                contact.lastName(),
+                contact.userId()
+        );
     }
 
     private void processUpdate(Update update) {
