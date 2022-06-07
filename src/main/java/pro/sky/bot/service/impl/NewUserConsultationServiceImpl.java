@@ -1,6 +1,5 @@
 package pro.sky.bot.service.impl;
 
-import com.pengrad.telegrambot.model.request.*;
 import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
@@ -12,6 +11,7 @@ import pro.sky.bot.model.Shelter;
 import pro.sky.bot.model.Volunteer;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.NewUserConsultationService;
+import pro.sky.bot.service.ConsultationService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class NewUserConsultationServiceImpl implements NewUserConsultationService {
+public class NewUserConsultationServiceImpl extends MessageSender implements ConsultationService {
 
     private final String START_MESSAGE = "Мы приют домашних живтоных. Здесь вы можете взять животное из нашего приюта.\n\n" +
                         "Для взаимодействия вы можете использвать следующие команды:\n" +
@@ -52,11 +52,13 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
             case (InfoKeyboard.SCHEDULE_BUTTON):
                 return new SendPhoto(chatId, getMapByCoordinates(shelter.getCoordinates()));
             case (InfoKeyboard.RULES_BUTTON):
-                return getRulesFromFile(chatId, shelter.getRulesPath());
+                return sendMessageFromTextFile(chatId, "rules.txt");
             case (InfoKeyboard.QUESTION_BUTTON):
                 return getVolunteerContact(chatId);
+            case (InfoKeyboard.ABOUT_BUTTON):
+                return getRulesFromFile(chatId, shelter.getShelterInfoPath());
             default:
-                return sendMessage(chatId, "Непредвиденная ошибка");
+                return sendDefaultMessage(chatId);
         }
     }
 
@@ -79,31 +81,6 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
         return response.getBody();
     }
 
-    /**
-     * Get rules from text file
-     * @param chatId chat identifier in telegram
-     * @param path path of text file with rules
-     * @return telegram SendMessage object
-     * @throws IOException
-     */
-    private SendMessage getRulesFromFile(Long chatId, String path) throws IOException {
-
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            return sendMessage(chatId, sb.toString());
-        } finally {
-            br.close();
-        }
-    }
-
     private SendMessage getVolunteerContact(Long chatId) {
         List<Volunteer> volunteers = volunteerRepository.findAll();
         Volunteer random = volunteers.get(getRandomNumber(0, volunteers.size() - 1));
@@ -113,32 +90,5 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
 
     public int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
-    }
-
-    /**
-     * Send text message to user
-     * @param chatId chat identifier in telegram
-     * @param message text message for user
-     * @return telegram SendMessage object
-     */
-    private SendMessage sendMessage(Long chatId, String message) {
-
-        return new SendMessage(chatId, message)
-                .parseMode(ParseMode.HTML)
-                .disableWebPagePreview(true)
-                .disableNotification(true);
-    }
-
-    /**
-     * Send text message to user and show keyboard
-     * @param chatId chat identifier in telegram
-     * @param message text message for user
-     * @param keyboard keyboard object to show
-     * @return telegram SendMessage object
-     */
-    private SendMessage sendMessage(Long chatId, String message, Keyboard keyboard) {
-
-        return sendMessage(chatId, message)
-                .replyMarkup(keyboard);
     }
 }

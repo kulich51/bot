@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.NewUserConsultationService;
+import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
+import pro.sky.bot.service.ConsultationService;
+import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
+import pro.sky.bot.service.impl.PotentialHostConsultationServiceImpl;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -27,11 +31,17 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final NewUserConsultationService newUserConsultationService;
     private final VolunteerRepository volunteerRepository;
+    private final PotentialHostConsultationServiceImpl potentialHostConsultationService;
 
-    public TelegramBotUpdatesListener(TelegramBot telegramBot, NewUserConsultationService newUserConsultationService, VolunteerRepository volunteerRepository) {
+    public TelegramBotUpdatesListener(
+      TelegramBot telegramBot,
+      NewUserConsultationService newUserConsultationService,
+      VolunteerRepository volunteerRepository,
+      PotentialHostConsultationServiceImpl potentialHostConsultationService) {
         this.telegramBot = telegramBot;
         this.newUserConsultationService = newUserConsultationService;
         this.volunteerRepository = volunteerRepository;
+        this.potentialHostConsultationService = potentialHostConsultationService
     }
 
     @PostConstruct
@@ -47,29 +57,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (addContact(update)) {
                 return;
             }
-
-            String userMessage = update.message().text();
-//            String userMessage = "update.message().text()";
-            Long chatId = update.message().chat().id();
-            switch (userMessage) {
-                case ("/start"):
-                case ("/shelter_info"):
-                case (InfoKeyboard.ABOUT_BUTTON):
-                case (InfoKeyboard.SCHEDULE_BUTTON):
-                case (InfoKeyboard.RULES_BUTTON):
-                case (InfoKeyboard.ADD_CONTACT_BUTTON):
-                case (InfoKeyboard.QUESTION_BUTTON):
-                    BaseRequest request = null;
-                    try {
-                        request = newUserConsultationService.parse(chatId, userMessage);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    telegramBot.execute(request);
-                    break;
-                default:
-                    telegramBot.execute(sendTextMessage(update.message(), "Sorry. Try again"));
-            }
+            processUpdate(update);
         });
 
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
@@ -78,16 +66,46 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private boolean addContact(Update update) {
         Contact contact = update.message().contact();
         if (contact != null) {
-            telegramBot.execute(sendTextMessage(update.message(), "Ваш контакт добавлен"));
+            telegramBot.execute(sendTextMessage(update.message().chat().id(), "Ваш контакт добавлен"));
             return true;
         }
         return false;
     }
 
+    private void processUpdate(Update update) {
+        Long chatId = update.message().chat().id();
+        String userMessage = update.message().text();
+        switch (userMessage) {
+            case ("/start"):
+            case ("/shelter_info"):
+            case (InfoKeyboard.ABOUT_BUTTON):
+            case (InfoKeyboard.SCHEDULE_BUTTON):
+            case (InfoKeyboard.RULES_BUTTON):
+            case (InfoKeyboard.ADD_CONTACT_BUTTON):
+            case (InfoKeyboard.QUESTION_BUTTON):
+                parseUserMessage(chatId, userMessage, newUserConsultationService);
+                break;
+            case ("/take_pet"):
+            case (PotentialHostConsultationKeyboard.RULES_OF_ACQUAINTANCE):
+            case (PotentialHostConsultationKeyboard.LIST_OF_DOCUMENTS):
+                parseUserMessage(chatId, userMessage, potentialHostConsultationService);
+                break;
+            default:
+                telegramBot.execute(sendTextMessage(chatId, "Sorry. Try again"));
+        }
+    }
 
-    private SendMessage sendTextMessage(Message userMessage, String message) {
+    private void parseUserMessage(Long chatId, String userMessage, ConsultationService service) {
+        BaseRequest request = null;
+        try {
+            request = service.parse(chatId, userMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        telegramBot.execute(request);
+    }
 
-        Long chatId = userMessage.chat().id();
+    private SendMessage sendTextMessage(Long chatId, String message) {
 
         return new SendMessage(chatId, message)
                 .parseMode(ParseMode.HTML)
