@@ -10,7 +10,8 @@ public class InfoKeyboard {
     public static final String SCHEDULE_BUTTON = "Часы работы";
     public static final String RULES_BUTTON = "Правила нахождения на территории";
     public static final String ADD_CONTACT_BUTTON = "Записать контакт";
-    public static final String CALL_VOLUNTEER_BUTTON = "Позвать волонтёра";
+    public static final String QUESTION_BUTTON = "Другой вопрос";
+
 
     private InfoKeyboard() {
     }
@@ -22,8 +23,9 @@ public class InfoKeyboard {
                 new KeyboardButton(SCHEDULE_BUTTON)
         )
                 .addRow(new KeyboardButton(RULES_BUTTON))
-                .addRow(new KeyboardButton(ADD_CONTACT_BUTTON),
-                        new KeyboardButton(CALL_VOLUNTEER_BUTTON))
+                .addRow(new KeyboardButton(ADD_CONTACT_BUTTON).requestContact(true),
+                        new KeyboardButton(QUESTION_BUTTON))
+
                 .resizeKeyboard(true)
                 .oneTimeKeyboard(true)
                 .selective(true);

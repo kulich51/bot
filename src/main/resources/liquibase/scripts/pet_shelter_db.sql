@@ -1,15 +1,19 @@
 --liquibase formatted sql
 --changeset kulich51: table contacts
-create table contacts(
-    user_id bigint primary key,
-    chat_id bigint,
-    username text,
+create table contacts
+(
+    user_id    bigint primary key,
+    chat_id    bigint,
+    username   text,
     first_name text
+    --user_message text
 );
 
--- create table user_appeal(
---     id serial primary key,
---     user_id bigint,
---     question_solved bool,
---     CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES contacts(user_id)
--- );
+--changeset danilkovich: table volunteer
+
+create table volunteer
+(
+    id       serial primary key,
+    username text
+);
+insert into volunteer values(1,'@sammy_69'), (2,'@vlkulikov'), (3,'@vladbashlakov');

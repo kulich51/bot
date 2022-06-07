@@ -2,6 +2,8 @@ package pro.sky.bot.listner;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Contact;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.BaseRequest;
@@ -10,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.InfoKeyboard;
+import pro.sky.bot.repository.VolunteerRepository;
+import pro.sky.bot.service.NewUserConsultationService;
 import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
 import pro.sky.bot.service.ConsultationService;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
@@ -25,17 +29,19 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
     private final TelegramBot telegramBot;
-    private final NewUserConsultationServiceImpl newUserConsultationService;
+    private final NewUserConsultationService newUserConsultationService;
+    private final VolunteerRepository volunteerRepository;
     private final PotentialHostConsultationServiceImpl potentialHostConsultationService;
 
     public TelegramBotUpdatesListener(
-            TelegramBot telegramBot,
-            NewUserConsultationServiceImpl newUserConsultationService,
-            PotentialHostConsultationServiceImpl potentialHostConsultationService
-    ) {
+      TelegramBot telegramBot,
+      NewUserConsultationService newUserConsultationService,
+      VolunteerRepository volunteerRepository,
+      PotentialHostConsultationServiceImpl potentialHostConsultationService) {
         this.telegramBot = telegramBot;
         this.newUserConsultationService = newUserConsultationService;
-        this.potentialHostConsultationService = potentialHostConsultationService;
+        this.volunteerRepository = volunteerRepository;
+        this.potentialHostConsultationService = potentialHostConsultationService
     }
 
     @PostConstruct
@@ -47,10 +53,23 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
+            // Проверка поделился ли пользователем контактом
+            if (addContact(update)) {
+                return;
+            }
             processUpdate(update);
         });
 
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
+    }
+
+    private boolean addContact(Update update) {
+        Contact contact = update.message().contact();
+        if (contact != null) {
+            telegramBot.execute(sendTextMessage(update.message().chat().id(), "Ваш контакт добавлен"));
+            return true;
+        }
+        return false;
     }
 
     private void processUpdate(Update update) {
@@ -63,7 +82,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             case (InfoKeyboard.SCHEDULE_BUTTON):
             case (InfoKeyboard.RULES_BUTTON):
             case (InfoKeyboard.ADD_CONTACT_BUTTON):
-            case (InfoKeyboard.CALL_VOLUNTEER_BUTTON):
+            case (InfoKeyboard.QUESTION_BUTTON):
                 parseUserMessage(chatId, userMessage, newUserConsultationService);
                 break;
             case ("/take_pet"):
