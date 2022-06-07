@@ -9,12 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.model.Shelter;
+import pro.sky.bot.model.Volunteer;
+import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.NewUserConsultationService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class NewUserConsultationServiceImpl implements NewUserConsultationService {
@@ -31,6 +35,11 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
     private final String INFO_URL = "/shelter_info";
 
     private final Shelter shelter = new Shelter();
+    private final VolunteerRepository volunteerRepository;
+
+    public NewUserConsultationServiceImpl(VolunteerRepository volunteerRepository) {
+        this.volunteerRepository = volunteerRepository;
+    }
 
 
     @Override
@@ -44,6 +53,8 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
                 return new SendPhoto(chatId, getMapByCoordinates(shelter.getCoordinates()));
             case (InfoKeyboard.RULES_BUTTON):
                 return getRulesFromFile(chatId, shelter.getRulesPath());
+            case (InfoKeyboard.QUESTION_BUTTON):
+                return getVolunteerContact(chatId);
             default:
                 return sendMessage(chatId, "Непредвиденная ошибка");
         }
@@ -91,6 +102,17 @@ public class NewUserConsultationServiceImpl implements NewUserConsultationServic
         } finally {
             br.close();
         }
+    }
+
+    private SendMessage getVolunteerContact(Long chatId) {
+        List<Volunteer> volunteers = volunteerRepository.findAll();
+        Volunteer random = volunteers.get(getRandomNumber(0, volunteers.size() - 1));
+        String message = "Обратитесь за помощбю к " + random.getUsername();
+        return sendMessage(chatId, message);
+    }
+
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 
     /**

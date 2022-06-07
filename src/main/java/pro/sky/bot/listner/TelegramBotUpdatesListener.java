@@ -2,6 +2,7 @@ package pro.sky.bot.listner;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Contact;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.InfoKeyboard;
+import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.NewUserConsultationService;
 
 import javax.annotation.PostConstruct;
@@ -24,10 +26,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private final TelegramBot telegramBot;
     private final NewUserConsultationService newUserConsultationService;
+    private final VolunteerRepository volunteerRepository;
 
-    public TelegramBotUpdatesListener(TelegramBot telegramBot, NewUserConsultationService newUserConsultationService) {
+    public TelegramBotUpdatesListener(TelegramBot telegramBot, NewUserConsultationService newUserConsultationService, VolunteerRepository volunteerRepository) {
         this.telegramBot = telegramBot;
         this.newUserConsultationService = newUserConsultationService;
+        this.volunteerRepository = volunteerRepository;
     }
 
     @PostConstruct
@@ -39,6 +43,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
+            // Проверка поделился ли пользователем контактом
+            if (addContact(update)) {
+                return;
+            }
 
             String userMessage = update.message().text();
 //            String userMessage = "update.message().text()";
@@ -50,7 +58,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 case (InfoKeyboard.SCHEDULE_BUTTON):
                 case (InfoKeyboard.RULES_BUTTON):
                 case (InfoKeyboard.ADD_CONTACT_BUTTON):
-                case (InfoKeyboard.CALL_VOLUNTEER_BUTTON):
+                case (InfoKeyboard.QUESTION_BUTTON):
                     BaseRequest request = null;
                     try {
                         request = newUserConsultationService.parse(chatId, userMessage);
@@ -66,6 +74,16 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
+
+    private boolean addContact(Update update) {
+        Contact contact = update.message().contact();
+        if (contact != null) {
+            telegramBot.execute(sendTextMessage(update.message(), "Ваш контакт добавлен"));
+            return true;
+        }
+        return false;
+    }
+
 
     private SendMessage sendTextMessage(Message userMessage, String message) {
 
