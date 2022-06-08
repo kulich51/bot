@@ -6,7 +6,7 @@ import javax.persistence.*;
 public class DatabaseContact {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(name = "phone_number")
@@ -18,15 +18,11 @@ public class DatabaseContact {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "user_id")
-    private Long userId;
-
-    public DatabaseContact(Long id, String phoneNumber, String firstName, String lastName, Long userId) {
+    public DatabaseContact(Long id, String phoneNumber, String firstName, String lastName) {
         this.id = id;
         this.phoneNumber = phoneNumber;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.userId = userId;
     }
 
     public DatabaseContact() {

@@ -77,11 +77,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private DatabaseContact createDatabaseContact(Contact contact) {
         return new DatabaseContact(
-                1L,
+                contact.userId(),
                 contact.phoneNumber(),
                 contact.firstName(),
-                contact.lastName(),
-                contact.userId()
+                contact.lastName()
         );
     }
 

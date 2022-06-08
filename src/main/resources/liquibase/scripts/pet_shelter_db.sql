@@ -2,11 +2,10 @@
 --changeset kulich51: table contacts
 create table contacts
 (
-    id serial primary key,
+    user_id bigint primary key,
     phone_number varchar(20) NOT NULL,
     first_name varchar(100),
-    last_name varchar(100),
-    user_id bigint NOT NULL
+    last_name varchar(100)
 );
 
 --changeset danilkovich: table volunteer
