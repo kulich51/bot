@@ -100,6 +100,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             case ("/take_pet"):
             case (PotentialHostConsultationKeyboard.RULES_OF_ACQUAINTANCE):
             case (PotentialHostConsultationKeyboard.LIST_OF_DOCUMENTS):
+            case (PotentialHostConsultationKeyboard.RECOMMENDATIONS):
                 parseUserMessage(chatId, userMessage, potentialHostConsultationService);
                 break;
             default:

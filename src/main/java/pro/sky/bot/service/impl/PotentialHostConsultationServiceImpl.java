@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
+import pro.sky.bot.keyboard.RecommendationsKeyboard;
 import pro.sky.bot.service.ConsultationService;
 
 import java.io.IOException;
@@ -30,6 +31,10 @@ public class PotentialHostConsultationServiceImpl extends MessageSender implemen
                 return sendMessageFromTextFile(chatId, RULES_OF_ACQUAINTANCE_FILE);
             case (PotentialHostConsultationKeyboard.LIST_OF_DOCUMENTS):
                 return sendMessageFromTextFile(chatId, LIST_OF_DOCUMENTS_FILE);
+            case (PotentialHostConsultationKeyboard.RECOMMENDATIONS):
+                return sendMessage(chatId,
+                        "Ознакомьтесь с рекомендациями ниже",
+                        RecommendationsKeyboard.keyboard());
             default:
                 sendDefaultMessage(chatId);
         }
