@@ -70,7 +70,7 @@ class BotApplicationTests {
                 "/start",
                 InfoKeyboard.ABOUT_BUTTON,
                 InfoKeyboard.RULES_BUTTON,
-                InfoKeyboard.CALL_VOLUNTEER_BUTTON
+                InfoKeyboard.QUESTION_BUTTON
         );
     }
 }
