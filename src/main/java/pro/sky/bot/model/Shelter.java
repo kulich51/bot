@@ -1,13 +1,13 @@
 package pro.sky.bot.model;
 
-public class Shelter {
+public abstract class Shelter {
 
-    private final String name = "Petsitters";
-    private final String schedule = "Круглосуточно";
-    private final String address = "ул. Заславская 17, Минск";
-    private final String coordinates = "27.538223,53.909286";
-    private final String rulesFile = "rules.txt";
-    private final String shelterInfoFile = "shelter_info.txt";
+    private String name;
+    private String schedule;
+    private String address;
+    private String coordinates;
+    private String rulesPath;
+    private String securityPhone;
 
     public String getName() {
         return name;
@@ -25,11 +25,35 @@ public class Shelter {
         return coordinates;
     }
 
-    public String getRulesFile() {
-        return rulesFile;
+    public String getRulesPath() {
+        return rulesPath;
     }
 
-    public String getShelterInfoFile() {
-        return shelterInfoFile;
+    public String getSecurityPhone() {
+        return securityPhone;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSchedule(String schedule) {
+        this.schedule = schedule;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setCoordinates(String coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public void setRulesPath(String rulesPath) {
+        this.rulesPath = rulesPath;
+    }
+
+    public void setSecurityPhone(String securityPhone) {
+        this.securityPhone = securityPhone;
     }
 }
