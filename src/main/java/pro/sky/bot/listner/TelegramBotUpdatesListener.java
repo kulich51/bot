@@ -12,14 +12,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
+import pro.sky.bot.keyboard.StartMenuKeyboard;
 import pro.sky.bot.model.DatabaseContact;
+import pro.sky.bot.model.Pets;
 import pro.sky.bot.repository.ContactRepository;
 import pro.sky.bot.service.ConsultationService;
+import pro.sky.bot.service.impl.GreetingServiceImpl;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
 import pro.sky.bot.service.impl.PotentialHostConsultationServiceImpl;
 
 import javax.annotation.PostConstruct;
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.List;
 
@@ -31,16 +33,20 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final NewUserConsultationServiceImpl newUserConsultationService;
     private final PotentialHostConsultationServiceImpl potentialHostConsultationService;
+    private final GreetingServiceImpl greetingService;
     private final ContactRepository contactRepository;
 
+    private Pets selectedPet;
+
     public TelegramBotUpdatesListener(
-      TelegramBot telegramBot,
-      NewUserConsultationServiceImpl newUserConsultationService,
-      PotentialHostConsultationServiceImpl potentialHostConsultationService,
-      ContactRepository contactRepository) {
+            TelegramBot telegramBot,
+            NewUserConsultationServiceImpl newUserConsultationService,
+            PotentialHostConsultationServiceImpl potentialHostConsultationService,
+            GreetingServiceImpl greetingService, ContactRepository contactRepository) {
         this.telegramBot = telegramBot;
         this.newUserConsultationService = newUserConsultationService;
         this.potentialHostConsultationService = potentialHostConsultationService;
+        this.greetingService = greetingService;
         this.contactRepository = contactRepository;
     }
 
@@ -89,29 +95,43 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         String userMessage = update.message().text();
         switch (userMessage) {
             case ("/start"):
-            case ("/shelter_info"):
-            case (InfoKeyboard.ABOUT_BUTTON):
-            case (InfoKeyboard.SCHEDULE_BUTTON):
-            case (InfoKeyboard.RULES_BUTTON):
-            case (InfoKeyboard.ADD_CONTACT_BUTTON):
-            case (InfoKeyboard.QUESTION_BUTTON):
-                parseUserMessage(chatId, userMessage, newUserConsultationService);
+                telegramBot.execute(greetingService.greeting(chatId));
                 break;
-            case ("/take_pet"):
-            case (PotentialHostConsultationKeyboard.RULES_OF_ACQUAINTANCE):
-            case (PotentialHostConsultationKeyboard.LIST_OF_DOCUMENTS):
-            case (PotentialHostConsultationKeyboard.RECOMMENDATIONS):
-                parseUserMessage(chatId, userMessage, potentialHostConsultationService);
+            case("/dogs"):
+                selectedPet = Pets.DOG;
+                telegramBot.execute(greetingService.getStartMenu(chatId));
+                break;
+            case("/cats"):
+                selectedPet = Pets.CAT;
+                telegramBot.execute(greetingService.getStartMenu(chatId));
+                break;
+            case (StartMenuKeyboard.ABOUT_BUTTON):
+                telegramBot.execute(greetingService.getInfoKeyboard(chatId));
+                break;
+            case (InfoKeyboard.ABOUT_BUTTON):
+                telegramBot.execute(newUserConsultationService.getAboutMessage(chatId, selectedPet));
+                break;
+            case (InfoKeyboard.SCHEDULE_BUTTON):
+                telegramBot.execute(newUserConsultationService.getShelterScheduleMessage(chatId, selectedPet));
+                telegramBot.execute(newUserConsultationService.getMapByCoordinates(chatId, selectedPet));
+                break;
+            case (InfoKeyboard.PERMIT_BUTTON):
+                telegramBot.execute(newUserConsultationService.getSecurityPhoneMessage(chatId, selectedPet));
+                break;
+            case (InfoKeyboard.RULES_BUTTON):
+                telegramBot.execute(newUserConsultationService.getRulesMessage(chatId));
+                break;
+            case (InfoKeyboard.ADD_CONTACT_BUTTON):
                 break;
             default:
                 telegramBot.execute(sendTextMessage(chatId, "Sorry. Try again"));
         }
     }
 
-    private void parseUserMessage(Long chatId, String userMessage, ConsultationService service) {
+    private void parseUserMessage(Long chatId, String userMessage, ConsultationService service, Pets pet) {
         BaseRequest request = null;
         try {
-            request = service.parse(chatId, userMessage);
+            request = service.parse(chatId, userMessage, pet);
         } catch (IOException e) {
             e.printStackTrace();
         }

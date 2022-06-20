@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
 import pro.sky.bot.keyboard.RecommendationsKeyboard;
+import pro.sky.bot.model.Pets;
 import pro.sky.bot.service.ConsultationService;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class PotentialHostConsultationServiceImpl extends MessageSender implemen
     public static final String LIST_OF_DOCUMENTS_FILE = "list of documents.txt";
 
     @Override
-    public SendMessage parse(Long chatId, String userMessage) throws IOException {
+    public SendMessage parse(Long chatId, String userMessage, Pets pet) throws IOException {
 
         switch (userMessage) {
             case(TAKE_PET_URL):
