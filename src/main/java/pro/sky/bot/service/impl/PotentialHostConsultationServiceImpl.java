@@ -18,7 +18,6 @@ public class PotentialHostConsultationServiceImpl extends MessageSender implemen
     public static final String RULES_OF_ACQUAINTANCE_FILE = "rules of acquaintance.txt";
     public static final String LIST_OF_DOCUMENTS_FILE = "list of documents.txt";
 
-    @Override
     public SendMessage parse(Long chatId, String userMessage, Pets pet) throws IOException {
 
         switch (userMessage) {
@@ -43,5 +42,8 @@ public class PotentialHostConsultationServiceImpl extends MessageSender implemen
         return null;
     }
 
-
+    @Override
+    public SendMessage getVolunteerContact(Long chatId) {
+        return null;
+    }
 }

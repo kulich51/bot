@@ -1,76 +1,116 @@
-//package pro.sky.bot;
-//
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.params.ParameterizedTest;
-//import org.junit.jupiter.params.provider.MethodSource;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import pro.sky.bot.keyboard.InfoKeyboard;
-//import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
-//
-//import java.io.IOException;
-//import java.util.stream.Stream;
-//
-//@SpringBootTest
-//class BotApplicationTests {
-//
-//    @Autowired
-//    private NewUserConsultationServiceImpl consultationService;
-//
-//    private final String TEXT_PARAMETER = "text";
-//    private final String PHOTO_PARAMETER = "photo";
-//    private final String DEFAULT_ANSWER = "Непредвиденная ошибка";
-//    private final Long DEFAULT_CHAT_ID = 1L;
-//
-//    @Test
-//    void contextLoads() {
-//    }
-//
-//    /**
-//     * Test reply on '/start' message from user
-//     */
-//    @ParameterizedTest
-//    @MethodSource("userMessageProvider")
-//    void testTextReplyLength(String userMessage) throws IOException {
-//        String textReply = (String) getReply(userMessage, TEXT_PARAMETER);
-//        Assertions.assertTrue(textReply.length() > 0);
-//    }
-//
-//    /**
-//     * Test that reply doesn't equals default answer
-//     */
-//    @ParameterizedTest
-//    @MethodSource("userMessageProvider")
-//    void testTextReplyData(String userMessage) throws IOException {
-//        String textReply = (String) getReply(userMessage, TEXT_PARAMETER);
-//        Assertions.assertNotEquals(DEFAULT_ANSWER, textReply);
-//    }
-//
-//    @Test
-//    void testScheduleButton() throws IOException {
-//        byte[] data =
-//                (byte[]) getReply(InfoKeyboard.SCHEDULE_BUTTON, PHOTO_PARAMETER);
-//
-//        Assertions.assertTrue(data.length > 0);
-//    }
-//
-//    private Object getReply(String userMessage, String parameter) throws IOException {
-//        return consultationService
-//                .parse(DEFAULT_CHAT_ID, userMessage)
-//                .getParameters()
-//                .get(parameter);
-//    }
-//
-//    /**
-//     * Provide user message passed throw the bot
-//     */
-//    static Stream<String> userMessageProvider() {
-//        return Stream.of(
-//                "/start",
-//                InfoKeyboard.ABOUT_BUTTON,
-//                InfoKeyboard.RULES_BUTTON,
-//                InfoKeyboard.QUESTION_BUTTON
-//        );
-//    }
-//}
+package pro.sky.bot;
+
+import com.pengrad.telegrambot.request.SendMessage;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import pro.sky.bot.model.Pets;
+import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@SpringBootTest
+class BotApplicationTests {
+
+    @Autowired
+    private NewUserConsultationServiceImpl consultationService;
+
+    private final String TEXT_PARAMETER = "text";
+    private final String PHOTO_PARAMETER = "photo";
+    private final Long DEFAULT_CHAT_ID = 1L;
+
+    @Test
+    void contextLoads() {
+    }
+
+    @Test
+    void testGetVolunteerContact() {
+
+        SendMessage message = consultationService.getVolunteerContact(DEFAULT_CHAT_ID);
+        String reply = getTextFromSendMessage(message);
+        System.out.println(reply);
+        assertTrue(reply.length() > 0);
+    }
+
+    @Test
+    void testGetVolunteerContactContainsUsername() {
+
+        SendMessage message = consultationService.getVolunteerContact(DEFAULT_CHAT_ID);
+        String reply = getTextFromSendMessage(message);
+        assertTrue(reply.contains("@"));
+    }
+
+    private String getTextFromSendMessage(SendMessage message) {
+
+        return (String) message
+                .getParameters()
+                .get(TEXT_PARAMETER);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Pets.class)
+    void testGetAboutMessageLength(Pets pet) {
+
+        SendMessage message = consultationService.getAboutMessage(DEFAULT_CHAT_ID, pet);
+        String reply = getTextFromSendMessage(message);
+        assertTrue(reply.length() > 0);
+    }
+
+    @Test
+    void testGetAboutMessageCatShelter() {
+
+        SendMessage message = consultationService.getAboutMessage(DEFAULT_CHAT_ID, Pets.CAT);
+        String reply = getTextFromSendMessage(message);
+        assertTrue(reply.contains("кошек"));
+        assertFalse(reply.contains("собак"));
+    }
+
+    @Test
+    void testGetAboutMessageDogShelter() {
+
+        SendMessage message = consultationService.getAboutMessage(DEFAULT_CHAT_ID, Pets.DOG);
+        String reply = getTextFromSendMessage(message);
+        assertTrue(reply.contains("собак"));
+        assertFalse(reply.contains("кошек"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(Pets.class)
+    void testGetShelterScheduleMessageLength(Pets pet) {
+
+        SendMessage message = consultationService.getShelterScheduleMessage(DEFAULT_CHAT_ID, pet);
+        String reply = getTextFromSendMessage(message);
+        assertTrue(reply.length() > 0);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Pets.class)
+    void testGetMapByCoordinatesSize(Pets pet) {
+
+        byte[] reply = (byte[]) consultationService
+                .getMapByCoordinates(DEFAULT_CHAT_ID, pet)
+                .getParameters()
+                .get(PHOTO_PARAMETER);
+        assertTrue(reply.length > 0);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Pets.class)
+    void testGetSecurityPhoneMessageLength(Pets pet) {
+
+        SendMessage message = consultationService.getSecurityPhoneMessage(DEFAULT_CHAT_ID, pet);
+        String reply = getTextFromSendMessage(message);
+        assertTrue(reply.length() > 0);
+    }
+
+    @Test
+    void testGetRulesMessageLength() {
+
+        SendMessage message = consultationService.getRulesMessage(DEFAULT_CHAT_ID);
+        String reply = getTextFromSendMessage(message);
+        assertTrue(reply.length() > 0);
+    }
+}

@@ -13,7 +13,6 @@ public class InfoKeyboard {
     public static final String ADD_CONTACT_BUTTON = "Записать контакт";
     public static final String CALL_VOLUNTEER_BUTTON = "Позвать волонтёра";
 
-
     private InfoKeyboard() {
     }
 
