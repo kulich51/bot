@@ -123,19 +123,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 break;
             case (InfoKeyboard.ADD_CONTACT_BUTTON):
                 break;
+            case (InfoKeyboard.CALL_VOLUNTEER_BUTTON):
+                telegramBot.execute(newUserConsultationService.getVolunteerContact(chatId));
+                break;
             default:
                 telegramBot.execute(sendTextMessage(chatId, "Sorry. Try again"));
         }
-    }
-
-    private void parseUserMessage(Long chatId, String userMessage, ConsultationService service, Pets pet) {
-        BaseRequest request = null;
-        try {
-            request = service.parse(chatId, userMessage, pet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        telegramBot.execute(request);
     }
 
     private SendMessage sendTextMessage(Long chatId, String message) {

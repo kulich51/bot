@@ -8,33 +8,43 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.keyboard.StartMenuKeyboard;
-import pro.sky.bot.model.CatShelter;
-import pro.sky.bot.model.DogShelter;
-import pro.sky.bot.model.Pets;
-import pro.sky.bot.model.Shelter;
+import pro.sky.bot.model.*;
+import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.ConsultationService;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class NewUserConsultationServiceImpl extends MessageSender implements ConsultationService {
 
+    private final VolunteerRepository volunteerRepository;
+
     private static final String RULES_FILE_NAME = "rules.txt";
 
-    @Override
-    public BaseRequest parse(Long chatId, String userMessage, Pets pet) throws IOException {
-        Shelter shelter = chooseShelter(pet);
-        switch (userMessage) {
-            case (StartMenuKeyboard.ABOUT_BUTTON):
-                return sendMessage(chatId, "Какая информация интересует?", InfoKeyboard.infoKeyBoard());
-            case (InfoKeyboard.RULES_BUTTON):
-                return sendMessageFromTextFile(chatId, "rules.txt");
-            default:
-                return sendDefaultMessage(chatId);
-        }
+    public NewUserConsultationServiceImpl(VolunteerRepository volunteerRepository) {
+        this.volunteerRepository = volunteerRepository;
     }
 
+    /**
+     * Get volunteer contact to text him
+     * @param chatId chatId chat identifier
+     * @return SenMessage object with volunteer contact in message
+     */
+    @Override
+    public SendMessage getVolunteerContact(Long chatId) {
+        List<Volunteer> volunteers = volunteerRepository.findAll();
+        Volunteer random = volunteers.get(getRandomNumber(0, volunteers.size() - 1));
+        String message = "Обратитесь за помощью к " + random.getUsername();
+        return sendMessage(chatId, message);
+    }
+
+    /**
+     * Get pet shelter
+     * @param pet type of pet shelter from enum (cat or dog)
+     * @return pet shelter
+     */
     private Shelter chooseShelter(Pets pet) {
         if (pet.equals(Pets.DOG)) {
             return new DogShelter();
@@ -42,6 +52,12 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
         return new CatShelter();
     }
 
+    /**
+     * Get information about shelter
+     * @param chatId chatId chat identifier
+     * @param pet type of pet shelter from enum (cat or dog)
+     * @return SenMessage object with shelter info in message
+     */
     public SendMessage getAboutMessage(Long chatId, Pets pet) {
 
         StringBuilder sb = new StringBuilder("Мы приют для ");
@@ -54,6 +70,12 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
         return sendMessage(chatId, sb.toString());
     }
 
+    /**
+     * Get shelter schedule
+     * @param chatId chatId chat identifier
+     * @param pet type of pet shelter from enum (cat or dog)
+     * @return SenMessage object with shelter schedule in message
+     */
     public SendMessage getShelterScheduleMessage(Long chatId, Pets pet) {
 
         Shelter shelter = chooseShelter(pet);
@@ -66,10 +88,10 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
     }
 
     /**
-     *
-     * @param chatId
-     * @param pet
-     * @return
+     * Get static map image by coordinates
+     * @param chatId chat identifier
+     * @param pet type of pet shelter from enum (cat or dog)
+     * @return SendPhoto image with byte array in message
      */
     public SendPhoto getMapByCoordinates(Long chatId, Pets pet) {
 
@@ -87,6 +109,12 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
         return new SendPhoto(chatId, response.getBody());
     }
 
+    /**
+     * Get security phone
+     * @param chatId chat identifier
+     * @param pet type of pet shelter from enum (cat or dog)
+     * @return SenMessage object with security in message
+     */
     public SendMessage getSecurityPhoneMessage(Long chatId, Pets pet) {
 
         String message = "Для оформления пропуска на машину позвонить по телефону:\n"
@@ -94,6 +122,11 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
         return sendMessage(chatId, message);
     }
 
+    /**
+     * Get rules of shelter which are stored in a file
+     * @param chatId chat identifier
+     * @return SenMessage object with rules in message
+     */
     public SendMessage getRulesMessage(Long chatId) {
 
         try {
@@ -101,5 +134,15 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
         } catch (IOException e) {
             return sendMessage(chatId, "Непредвиденная ошибка");
         }
+    }
+
+    /**
+     * Get random number from interval
+     * @param min min number
+     * @param max max number
+     * @return random number
+     */
+    private int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 }
