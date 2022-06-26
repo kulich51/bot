@@ -12,6 +12,13 @@ public class Volunteer {
     @Column(name = "username")
     private String username;
 
+    public Volunteer(String name) {
+    }
+
+    public Volunteer() {
+
+    }
+
     public Long getId() {
         return id;
     }
