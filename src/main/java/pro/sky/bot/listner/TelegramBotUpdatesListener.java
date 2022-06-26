@@ -5,24 +5,20 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Contact;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.InfoKeyboard;
-import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
 import pro.sky.bot.keyboard.StartMenuKeyboard;
 import pro.sky.bot.model.DatabaseContact;
-import pro.sky.bot.model.Pets;
+import pro.sky.bot.enums.Pets;
 import pro.sky.bot.repository.ContactRepository;
-import pro.sky.bot.service.ConsultationService;
 import pro.sky.bot.service.impl.GreetingServiceImpl;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
 import pro.sky.bot.service.impl.PotentialHostConsultationServiceImpl;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -93,6 +89,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private void processUpdate(Update update) {
         Long chatId = update.message().chat().id();
         String userMessage = update.message().text();
+
         switch (userMessage) {
             case ("/start"):
                 telegramBot.execute(greetingService.greeting(chatId));

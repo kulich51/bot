@@ -1,13 +1,11 @@
 package pro.sky.bot.service.impl;
 
-import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import pro.sky.bot.keyboard.InfoKeyboard;
-import pro.sky.bot.keyboard.StartMenuKeyboard;
+import pro.sky.bot.enums.Pets;
 import pro.sky.bot.model.*;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.ConsultationService;

@@ -8,25 +8,26 @@ create table contacts
     last_name    varchar(100)
 );
 
---changeset danilkovich: table volunteer
+--changeset danilkovich_1: table volunteer
 
 create table volunteer
 (
     id       serial primary key,
     username text
 );
+
 insert into volunteer
 values (1, '@sammy_69'),
        (2, '@vlkulikov'),
        (3, '@vladbashlakov');
 
---changeset danilkovich: table adopter
+--changeset danilkovich_2: table adopter
 
 CREATE TABLE adopter
 (
+    id serial PRIMARY KEY,
     user_id              bigint   NOT NULL,
     pet_id               bigint   NOT NULL,
-    kind                 SMALLINT NOT NULL,
     is_probation_checked BOOLEAN default false,
     date_probation       DATE,
     probation_days       INTEGER DEFAULT 30,
@@ -54,3 +55,12 @@ CREATE TABLE reports
 
 );
 
+--changeset kulich52: table pets
+CREATE TABLE pets
+(
+    id serial primary key,
+    name varchar(30) UNIQUE,
+    kind varchar(3) NOT NULL
+);
+
+ALTER TABLE pets ADD CONSTRAINT allowed_pet_kinds CHECK ( kind = ANY ('{CAT, DOG}' :: text[]))
