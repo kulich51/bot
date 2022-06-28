@@ -6,7 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import pro.sky.bot.model.Pets;
+import pro.sky.bot.enums.Pets;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

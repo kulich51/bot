@@ -1,4 +1,4 @@
-package pro.sky.bot.model;
+package pro.sky.bot.enums;
 
 public enum Pets {
 

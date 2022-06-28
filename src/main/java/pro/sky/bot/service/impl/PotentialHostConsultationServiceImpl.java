@@ -1,11 +1,10 @@
 package pro.sky.bot.service.impl;
 
 import com.pengrad.telegrambot.request.SendMessage;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.keyboard.PotentialHostConsultationKeyboard;
 import pro.sky.bot.keyboard.RecommendationsKeyboard;
-import pro.sky.bot.model.Pets;
+import pro.sky.bot.enums.Pets;
 import pro.sky.bot.service.ConsultationService;
 
 import java.io.IOException;
