@@ -26,9 +26,4 @@ public class GreetingServiceImpl extends MessageSender implements GreetingServic
     public SendMessage getStartMenu(Long chatId) {
         return sendMessage(chatId, startMenuMessage, StartMenuKeyboard.startMenuKeyboard());
     }
-
-    @Override
-    public SendMessage getInfoKeyboard(Long chatId) {
-        return sendMessage(chatId, "Какая информация интересует?", InfoKeyboard.infoKeyBoard());
-    }
 }

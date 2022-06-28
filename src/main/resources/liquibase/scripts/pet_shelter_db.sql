@@ -35,23 +35,17 @@ CREATE TABLE adopter
     CONSTRAINT fk_user_adopter FOREIGN KEY (user_id) REFERENCES contacts (user_id)
 );
 
-CREATE TABLE photos
-(
-    id         serial primary key,
-    data       bytea,
-    media_type varchar(255)
-);
-
 CREATE TABLE reports
 (
     id          serial PRIMARY KEY,
     user_id     bigint NOT NULL,
-    photo_id    bigint,
+    pet_id      bigint NOT NULL,
+    file_id     text,
     date        date   NOT NULL,
     text_report text,
     is_accepted boolean default false,
     CONSTRAINT fk_user_reports FOREIGN KEY (user_id) REFERENCES contacts (user_id),
-    CONSTRAINT fk_photos foreign key (photo_id) references photos (id)
+    CONSTRAINT fk_pet_reports FOREIGN KEY (pet_id) REFERENCES pets (id)
 
 );
 
@@ -63,4 +57,4 @@ CREATE TABLE pets
     kind varchar(3) NOT NULL
 );
 
-ALTER TABLE pets ADD CONSTRAINT allowed_pet_kinds CHECK ( kind = ANY ('{CAT, DOG}' :: text[]))
+ALTER TABLE pets ADD CONSTRAINT allowed_pet_kinds CHECK ( kind = ANY ('{CAT, DOG}' :: text[]));

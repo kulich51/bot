@@ -42,6 +42,11 @@ public class PotentialHostConsultationServiceImpl extends MessageSender implemen
     }
 
     @Override
+    public SendMessage getKeyboard(Long chatId) {
+        return null;
+    }
+
+    @Override
     public SendMessage getVolunteerContact(Long chatId) {
         return null;
     }
