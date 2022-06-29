@@ -19,8 +19,8 @@ public class Report {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-    @Column(name = "file_id")
-    private String fileId;
+    @Column(name = "file_path")
+    private String filePath;
 
     @Column(name = "date")
     private Date date;
@@ -38,7 +38,7 @@ public class Report {
         this.id = id;
         this.userId = userId;
         this.pet = pet;
-        this.fileId = fileId;
+        this.filePath = fileId;
         this.date = date;
         this.textReport = textReport;
         this.isAccepted = isAccepted;
@@ -60,12 +60,12 @@ public class Report {
         this.pet = pet;
     }
 
-    public String getFileId() {
-        return fileId;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
+    public void setFilePath(String fileId) {
+        this.filePath = fileId;
     }
 
     public Date getDate() {
@@ -106,7 +106,7 @@ public class Report {
                 "id=" + id +
                 ", userId=" + userId +
                 ", pet=" + pet +
-                ", fileId='" + fileId + '\'' +
+                ", fileId='" + filePath + '\'' +
                 ", date=" + date +
                 ", textReport='" + textReport + '\'' +
                 ", isAccepted=" + isAccepted +

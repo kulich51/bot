@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Contact;
 import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.GetFile;
@@ -19,6 +20,7 @@ import pro.sky.bot.keyboard.ReportKeyboard;
 import pro.sky.bot.keyboard.StartMenuKeyboard;
 import pro.sky.bot.model.DatabaseContact;
 import pro.sky.bot.enums.Pets;
+import pro.sky.bot.model.Pet;
 import pro.sky.bot.model.Report;
 import pro.sky.bot.repository.ContactRepository;
 import pro.sky.bot.repository.PetRepository;
@@ -79,7 +81,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 return;
             }
 
-            if (getAdopterReport(update)) {
+            if (saveAdopterReport(update)) {
                 return;
             }
 
@@ -89,31 +91,126 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private boolean getAdopterReport(Update update) {
+    private Boolean saveAdopterReport(Update update) {
 
-        Long chatId = update.message().chat().id();
-        if (update.message().photo() != null && update.message().caption() !=null) {
+        Message message = update.message();
+        Long chatId = message.chat().id();
 
-            GetFile request = new GetFile(update.message().photo()[2].fileId());
-            GetFileResponse getFileResponse = telegramBot.execute(request);
-            File file = getFileResponse.file();
+        if (message.photo() != null) {
 
-            Report report = new Report();
-            report.setId(0L);
-            report.setFileId(telegramBot.getFullFilePath(file));
-            report.setTextReport(update.message().caption());
-            report.setPet(petRepository.getByName("sad"));
+            boolean captionIsNull = checkReportCaption(message, chatId);
 
-            Instant instant = Instant.ofEpochSecond(update.message().date());
-            java.util.Date date = Date.from(instant);
+            // Если к отчету приложено только фото, то выходим из метода
+            if (captionIsNull) {
+                return true;
+            }
 
-            report.setDate(date);
-            report.setUserId(update.message().from().id());
-            reportsRepository.save(report);
+            String petName = getPetName(update);
+            Pet pet = petRepository.getByName(petName);
+            boolean petIsNull = checkPet(pet, petName, chatId);
 
+            // Если животное найдено в БД, то сохраняем присланный отчет в БД
+            if (!petIsNull) {
+                Long userId = message.from().id();
+                File file = getPhotoFile(update);
+                java.util.Date date = convertUnixDate(update);
+                String textReport = getReport(update);
+
+                Report report = new Report(
+                        0L,
+                        userId,
+                        pet,
+                        telegramBot.getFullFilePath(file),
+                        date,
+                        textReport,
+                        false
+                );
+                reportsRepository.save(report);
+            }
             return true;
         }
         return false;
+    }
+
+    private boolean checkReportCaption(Message message, Long chatId) {
+
+        if (message.caption() == null) {
+            telegramBot.execute(
+                    sendTextMessage(
+                    chatId,
+                    "Пришлите отчёт заново. К фотографиии необходимо приложить отчёт согласно форме"
+                    )
+            );
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkPet(Pet pet, String petName, Long chatId) {
+
+        if (pet == null) {
+            telegramBot.execute(
+                    sendTextMessage(
+                    chatId,
+                    "Животное с кличкой '" + petName + "' не найдено. Повторите снова"
+                    )
+            );
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get File object from bot with report photo
+     * @param update user's message
+     * @return File object
+     */
+    private File getPhotoFile(Update update) {
+
+        GetFile request = new GetFile(update.message().photo()[2].fileId());
+        GetFileResponse getFileResponse = telegramBot.execute(request);
+        return getFileResponse.file();
+    }
+
+    /**
+     * Get date of a message from unix timestamp
+     * @param update user's message
+     * @return date of a message
+     */
+    private java.util.Date convertUnixDate(Update update) {
+
+        Instant instant = Instant.ofEpochSecond(update.message().date());
+        return Date.from(instant);
+    }
+
+    /**
+     * Get pet name from users' message (first row from message)
+     * @param update user's message
+     * @return pet name
+     */
+    private String getPetName(Update update) {
+
+        String caption = update
+                .message()
+                .caption();
+
+        int petNameLastIndex = caption.indexOf("\n");
+        return caption.substring(0, petNameLastIndex);
+    }
+
+    /**
+     * Get report from users' message (first row from message)
+     * @param update user's message
+     * @return text report about pet
+     */
+    private String getReport(Update update) {
+
+        String caption = update
+                .message()
+                .caption();
+
+        int petNameLastIndex = caption.indexOf("\n");
+        return caption.substring(petNameLastIndex + 1);
     }
 
     private byte[] downloadImage(String url) {

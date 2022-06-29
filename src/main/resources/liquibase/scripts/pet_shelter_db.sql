@@ -40,7 +40,7 @@ CREATE TABLE reports
     id          serial PRIMARY KEY,
     user_id     bigint NOT NULL,
     pet_id      bigint NOT NULL,
-    file_id     text,
+    file_path     text,
     date        date   NOT NULL,
     text_report text,
     is_accepted boolean default false,

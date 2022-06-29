@@ -26,6 +26,7 @@ public class ReportServiceImpl extends MessageSender implements ConsultationServ
     public SendMessage getReportForm(Long chatId) {
 
         String message = "В ежедневный отчет входит следующая информация:\n" +
+                "- Кличка животного\n" +
                 "- Фото животного\n" +
                 "- Рацион животного\n" +
                 "- Общее самочувствие и привыкание к новому месту\n" +
