@@ -18,21 +18,24 @@ import org.springframework.web.client.RestTemplate;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.keyboard.ReportKeyboard;
 import pro.sky.bot.keyboard.StartMenuKeyboard;
+import pro.sky.bot.model.Adopter;
 import pro.sky.bot.model.DatabaseContact;
 import pro.sky.bot.enums.Pets;
 import pro.sky.bot.model.Pet;
 import pro.sky.bot.model.Report;
+import pro.sky.bot.repository.AdopterRepository;
 import pro.sky.bot.repository.ContactRepository;
 import pro.sky.bot.repository.PetRepository;
-import pro.sky.bot.repository.ReportsRepository;
+import pro.sky.bot.repository.ReportRepository;
 import pro.sky.bot.service.impl.GreetingServiceImpl;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
 import pro.sky.bot.service.impl.PotentialHostConsultationServiceImpl;
-import pro.sky.bot.service.impl.ReportServiceImpl;
+import pro.sky.bot.service.impl.ReportInfoServiceImpl;
 
 import javax.annotation.PostConstruct;
 import java.sql.Date;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,20 +46,21 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private final TelegramBot telegramBot;
     private final NewUserConsultationServiceImpl newUserConsultationService;
-    private final ReportServiceImpl reportService;
+    private final ReportInfoServiceImpl reportService;
     private final PotentialHostConsultationServiceImpl potentialHostConsultationService;
     private final GreetingServiceImpl greetingService;
     private final ContactRepository contactRepository;
     private final PetRepository petRepository;
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportsRepository;
+    private final AdopterRepository adopterRepository;
 
     private Pets selectedPet;
 
     public TelegramBotUpdatesListener(
             TelegramBot telegramBot,
             NewUserConsultationServiceImpl newUserConsultationService,
-            ReportServiceImpl reportService, PotentialHostConsultationServiceImpl potentialHostConsultationService,
-            GreetingServiceImpl greetingService, ContactRepository contactRepository, PetRepository petRepository, ReportsRepository reportsRepository) {
+            ReportInfoServiceImpl reportService, PotentialHostConsultationServiceImpl potentialHostConsultationService,
+            GreetingServiceImpl greetingService, ContactRepository contactRepository, PetRepository petRepository, ReportRepository reportsRepository, AdopterRepository adopterRepository) {
         this.telegramBot = telegramBot;
         this.newUserConsultationService = newUserConsultationService;
         this.reportService = reportService;
@@ -65,6 +69,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         this.contactRepository = contactRepository;
         this.petRepository = petRepository;
         this.reportsRepository = reportsRepository;
+        this.adopterRepository = adopterRepository;
     }
 
     @PostConstruct
@@ -76,11 +81,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
+
             // Проверка поделился ли пользователем контактом
             if (addContact(update)) {
                 return;
             }
 
+            // Проверка напрявляет ли пользователь отчёт
             if (saveAdopterReport(update)) {
                 return;
             }
@@ -91,6 +98,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
+    /**
+     * Save adopter report (photo with text) in repository
+     * @param update user's message
+     * @return true if user sent photo, otherwise false
+     */
     private Boolean saveAdopterReport(Update update) {
 
         Message message = update.message();
@@ -109,29 +121,63 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             Pet pet = petRepository.getByName(petName);
             boolean petIsNull = checkPet(pet, petName, chatId);
 
-            // Если животное найдено в БД, то сохраняем присланный отчет в БД
-            if (!petIsNull) {
-                Long userId = message.from().id();
-                File file = getPhotoFile(update);
-                java.util.Date date = convertUnixDate(update);
-                String textReport = getReport(update);
+            // Если живтное не найдено, то выходим из метода
+            if (petIsNull) {
+                return true;
+            }
 
-                Report report = new Report(
-                        0L,
-                        userId,
-                        pet,
-                        telegramBot.getFullFilePath(file),
-                        date,
-                        textReport,
-                        false
+            boolean userIsNotAdopter = checkAdopter(message, pet);
+
+            // Если усыновитель не найден, то выходим из метода
+            if (userIsNotAdopter) {
+                return true;
+            }
+
+            Long userId = message.from().id();
+            File file = getPhotoFile(update);
+            java.util.Date date = convertUnixDate(update);
+            String textReport = getReport(update);
+
+            Report oldReport = reportsRepository.findByUserIdAndPetAndDate(userId, pet, date);
+
+            Report report = new Report(
+                    0L,
+                    userId,
+                    pet,
+                    telegramBot.getFullFilePath(file),
+                    date,
+                    textReport,
+                    false
                 );
+
+            // Если отчет по питомцу есть в БД, то обновляем его на новый
+            if (oldReport != null) {
+                updateReport(oldReport, report);
+                telegramBot.execute(sendTextMessage(chatId, "Отчет откорректирован. Спасибо!"));
+            } else {
                 reportsRepository.save(report);
+                telegramBot.execute(sendTextMessage(chatId, "Отчет сохранён. Спасибо!"));
             }
             return true;
         }
         return false;
     }
 
+    private void updateReport(Report oldReport, Report report) {
+
+        oldReport.setAccepted(false);
+        oldReport.setFilePath(report.getFilePath());
+        oldReport.setTextReport(report.getTextReport());
+        reportsRepository.save(oldReport);
+    }
+
+
+    /**
+     * Check caption of report by null
+     * @param message user message via bot
+     * @param chatId chat id in bot
+     * @return true if caption is null, otherwise false
+     */
     private boolean checkReportCaption(Message message, Long chatId) {
 
         if (message.caption() == null) {
@@ -146,6 +192,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return false;
     }
 
+    /**
+     * Check what pet object not null
+     * @param pet pet object
+     * @param petName pet name to find in repository
+     * @param chatId chat id in bot
+     * @return true if pet is null (not found), otherwise false
+     */
     private boolean checkPet(Pet pet, String petName, Long chatId) {
 
         if (pet == null) {
@@ -153,6 +206,29 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     sendTextMessage(
                     chatId,
                     "Животное с кличкой '" + petName + "' не найдено. Повторите снова"
+                    )
+            );
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param message
+     * @param pet
+     * @return
+     */
+    private boolean checkAdopter(Message message, Pet pet) {
+
+        Long userId = message.from().id();
+        Adopter adopter = adopterRepository.getAdopterByUserIdAndPet(userId, pet);
+
+        if (adopter == null) {
+            telegramBot.execute(
+                    sendTextMessage(
+                            message.chat().id(),
+                            "Вы не являетесь усыновителем животного '" + pet.getName() + "'"
                     )
             );
             return true;
@@ -190,12 +266,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
      */
     private String getPetName(Update update) {
 
-        String caption = update
+        String[] caption = update
                 .message()
-                .caption();
+                .caption()
+                .split("\n");
 
-        int petNameLastIndex = caption.indexOf("\n");
-        return caption.substring(0, petNameLastIndex);
+        return caption[0];
     }
 
     /**
@@ -205,22 +281,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
      */
     private String getReport(Update update) {
 
-        String caption = update
+        String[] caption = update
                 .message()
-                .caption();
+                .caption()
+                .split("\n");
 
-        int petNameLastIndex = caption.indexOf("\n");
-        return caption.substring(petNameLastIndex + 1);
-    }
-
-    private byte[] downloadImage(String url) {
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.ALL));
-        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
-        ResponseEntity<byte[]> result = restTemplate.exchange(url, HttpMethod.GET, httpEntity, byte[].class);
-        return result.getBody();
+        String[] report = Arrays.copyOfRange(caption, 1, caption.length);
+        return String.join("\n", report);
     }
 
     private boolean addContact(Update update) {

@@ -1,11 +1,16 @@
 package pro.sky.bot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Set;
 
 @Entity
 @Table(name = "pets")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Pet {
 
     @Id
@@ -19,7 +24,8 @@ public class Pet {
     @Column(name = "kind")
     private String kind;
 
-    @OneToMany(mappedBy = "pet")
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Collection<Report> reports;
 
     public Pet() {
