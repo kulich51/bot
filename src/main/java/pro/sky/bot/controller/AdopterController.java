@@ -3,7 +3,6 @@ package pro.sky.bot.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.bot.model.Adopter;
-import pro.sky.bot.model.Pet;
 import pro.sky.bot.service.AdopterService;
 
 import java.util.Collection;
@@ -24,8 +23,8 @@ public class AdopterController {
     }
 
     @GetMapping("/all")
-    ResponseEntity<Collection<Adopter>> getAll() {
-        return ResponseEntity.ok(adopterService.getAll());
+    ResponseEntity<Collection<Adopter>> getAll(@RequestParam(defaultValue = "true") Boolean onProbation ) {
+        return ResponseEntity.ok(adopterService.getAdopters(onProbation));
     }
 
     @GetMapping("/{userId}")

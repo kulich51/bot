@@ -12,14 +12,11 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.keyboard.ReportKeyboard;
 import pro.sky.bot.keyboard.StartMenuKeyboard;
 import pro.sky.bot.model.Adopter;
-import pro.sky.bot.model.DatabaseContact;
 import pro.sky.bot.enums.Pets;
 import pro.sky.bot.model.Pet;
 import pro.sky.bot.model.Report;
@@ -36,7 +33,6 @@ import javax.annotation.PostConstruct;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -147,7 +143,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     telegramBot.getFullFilePath(file),
                     date,
                     textReport,
-                    false
+                    true
                 );
 
             // Если отчет по питомцу есть в БД, то обновляем его на новый
@@ -222,7 +218,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private boolean checkAdopter(Message message, Pet pet) {
 
         Long userId = message.from().id();
-        Adopter adopter = adopterRepository.getAdopterByUserIdAndPet(userId, pet);
+        Adopter adopter = adopterRepository.getAdopterByUserIdAndPetId(userId, pet.getId());
 
         if (adopter == null) {
             telegramBot.execute(
@@ -292,22 +288,23 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private boolean addContact(Update update) {
 
-        Contact contact = update.message().contact();
+        Contact tgContact = update.message().contact();
 
-        if (contact != null) {
-            contactRepository.save(createDatabaseContact(contact));
+        if (tgContact != null) {
+            contactRepository.save(createDatabaseContact(tgContact, update.message().chat().id()));
             telegramBot.execute(sendTextMessage(update.message().chat().id(), "Ваш контакт добавлен"));
             return true;
         }
         return false;
     }
 
-    private DatabaseContact createDatabaseContact(Contact contact) {
-        return new DatabaseContact(
+    private pro.sky.bot.model.Contact createDatabaseContact(Contact contact, Long chatId) {
+        return new pro.sky.bot.model.Contact(
                 contact.userId(),
                 contact.phoneNumber(),
                 contact.firstName(),
-                contact.lastName()
+                contact.lastName(),
+                chatId
         );
     }
 

@@ -1,5 +1,6 @@
 package pro.sky.bot.service;
 
+import pro.sky.bot.model.Adopter;
 import pro.sky.bot.model.Photo;
 import pro.sky.bot.model.Report;
 
@@ -9,6 +10,5 @@ public interface ReportService {
 
     Collection<Report> getReportsByPet(String petName);
     Report getReportByPetNameAndId(String petName, Long reportId, Boolean accpeted);
-
     Photo getReportPhoto(String petName, Long reportId);
 }
