@@ -10,4 +10,5 @@ public interface AdopterService {
     Collection<Adopter> getAdopters(Boolean onProbation);
     Collection<Adopter> getAdopter(Long userId);
     void removeAdopter(Long id);
+    Adopter changeProbation(Adopter adopter, boolean acceptProbation, int days);
 }

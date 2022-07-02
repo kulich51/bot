@@ -32,6 +32,13 @@ public class AdopterController {
         return ResponseEntity.ok(adopterService.getAdopter(userId));
     }
 
+    @PutMapping
+    ResponseEntity<Adopter> changeProbation(@RequestBody Adopter adopter,
+                                            @RequestParam(defaultValue = "false") boolean acceptProbation,
+                                            @RequestParam (defaultValue = "0") int days) {
+        return ResponseEntity.ok(adopterService.changeProbation(adopter, acceptProbation, days));
+    }
+
     @DeleteMapping("/{id}")
     ResponseEntity removeAdopter(@PathVariable Long id) {
         adopterService.removeAdopter(id);
