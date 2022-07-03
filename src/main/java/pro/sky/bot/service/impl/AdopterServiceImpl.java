@@ -35,6 +35,7 @@ public class AdopterServiceImpl implements AdopterService {
 
         Date start = adopter.getStartDateProbation();
         adopter.setFinishDateProbation(getFinishDate(start, 30));
+        adopter.setProbationChecked(false);
         return adopterRepository.save(adopter);
     }
 

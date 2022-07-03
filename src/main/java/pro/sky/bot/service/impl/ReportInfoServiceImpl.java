@@ -20,7 +20,8 @@ public class ReportInfoServiceImpl extends MessageSender implements Consultation
 
     @Override
     public SendMessage getKeyboard(Long chatId) {
-        return sendMessage(chatId, "Выберите, что вас интересует", ReportKeyboard.reportKeyboard());
+        return sendMessage(chatId, "Можете отправить отчёт о питомце в любой момент.\n" +
+                "Дополнительная информация по кнопкам ниже", ReportKeyboard.reportKeyboard());
     }
 
     public SendMessage getReportForm(Long chatId) {

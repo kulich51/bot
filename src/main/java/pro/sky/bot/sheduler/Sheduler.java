@@ -118,7 +118,7 @@ public class Sheduler {
     }
 
     /**
-     * Get yesterday relatively today date
+     * Get yesterday date relatively today
      * @return yesterday date
      */
     private Date getYesterdayDate() {

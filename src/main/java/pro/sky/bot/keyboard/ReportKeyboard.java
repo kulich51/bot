@@ -7,7 +7,6 @@ import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 public class ReportKeyboard {
 
     public static final String REPORT_FORM_BUTTON = "Узнат форму отчёта";
-    public static final String SEND_REPORT_BUTTON = "Отправить отчёт";
     public static final String CALL_VOLUNTEER_BUTTON = "Позвать волонтёра";
 
 
@@ -19,7 +18,6 @@ public class ReportKeyboard {
         Keyboard keyboard = new ReplyKeyboardMarkup(
                 new KeyboardButton(REPORT_FORM_BUTTON)
         )
-                .addRow(new KeyboardButton(SEND_REPORT_BUTTON))
                 .addRow(new KeyboardButton(CALL_VOLUNTEER_BUTTON))
                 .resizeKeyboard(true)
                 .oneTimeKeyboard(true)
