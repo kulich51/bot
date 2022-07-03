@@ -6,11 +6,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pro.sky.bot.enums.Pets;
+import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.model.*;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.ConsultationService;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +23,16 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
 
     public NewUserConsultationServiceImpl(VolunteerRepository volunteerRepository) {
         this.volunteerRepository = volunteerRepository;
+    }
+
+    /**
+     * Get InfoKeyboard
+     * @param chatId - chatId chat identifier
+     * @return SendMessage object with keyboard
+     */
+    @Override
+    public SendMessage getKeyboard(Long chatId) {
+        return sendMessage(chatId, "Какая информация интересует?", InfoKeyboard.infoKeyBoard());
     }
 
     /**
@@ -127,11 +137,8 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
      */
     public SendMessage getRulesMessage(Long chatId) {
 
-        try {
-            return sendMessageFromTextFile(chatId, RULES_FILE_NAME);
-        } catch (IOException e) {
-            return sendMessage(chatId, "Непредвиденная ошибка");
-        }
+        String rulesPath = "common/rules.txt";
+        return sendMessageFromTextFile(chatId, rulesPath);
     }
 
     /**

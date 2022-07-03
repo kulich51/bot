@@ -1,9 +1,14 @@
 package pro.sky.bot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "pets")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Pet {
 
     @Id
@@ -17,16 +22,18 @@ public class Pet {
     @Column(name = "kind")
     private String kind;
 
-    @OneToOne (mappedBy = "pet")
-    private Adopter adopter;
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Collection<Report> reports;
 
     public Pet() {
     }
 
-    public Pet(Long id, String name, String kind) {
+    public Pet(Long id, String name, String kind, Collection<Report> reports) {
         this.id = id;
         this.name = name;
         this.kind = kind;
+        this.reports = reports;
     }
 
     public Long getId() {
@@ -53,32 +60,21 @@ public class Pet {
         this.kind = kind;
     }
 
+    public Collection<Report> getReports() {
+        return reports;
+    }
+
+    public void setReports(Collection<Report> reports) {
+        this.reports = reports;
+    }
+
     @Override
     public String toString() {
         return "Pet{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", kind='" + kind + '\'' +
+                ", reports=" + reports +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Pet pet = (Pet) o;
-
-        if (id != null ? !id.equals(pet.id) : pet.id != null) return false;
-        if (name != null ? !name.equals(pet.name) : pet.name != null) return false;
-        return kind != null ? kind.equals(pet.kind) : pet.kind == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (kind != null ? kind.hashCode() : 0);
-        return result;
     }
 }

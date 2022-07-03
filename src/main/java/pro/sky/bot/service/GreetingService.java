@@ -6,5 +6,4 @@ public interface GreetingService  {
 
     SendMessage greeting(Long chatId);
     SendMessage getStartMenu(Long chatId);
-    SendMessage getInfoKeyboard(Long chatId);
 }

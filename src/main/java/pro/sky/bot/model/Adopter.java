@@ -1,11 +1,8 @@
 package pro.sky.bot.model;
 
 
-import pro.sky.bot.enums.Pets;
-
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.Objects;
+import java.util.Date;
 
 /**
  * сущность таблицы усыновителей
@@ -16,8 +13,8 @@ import java.util.Objects;
  * dateProbation - дата срока
  * probationDays - количество дней
  * extraDays     - доп дни
- * is_checked = true - весь испытательный срок
- * по окончанию is_checked = false
+ * is_probation_checked = true - весь испытательный срок
+ * по окончанию is_probation_checked = false
  * kind - вид животного
  */
 @Entity
@@ -26,35 +23,31 @@ public class Adopter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
     @Column(name = "user_id")
-    public Long userId;
+    private Long userId;
 
-    @OneToOne (cascade = CascadeType.ALL)
-    @JoinColumn (name = "pet_id", referencedColumnName = "id")
-    public Pet pet;
+    @Column(name = "pet_id")
+    private Long petId;
 
     @Column(name = "is_probation_checked")
-    public boolean isProbation_checked;
-    @Column(name = "date_Probation")
-    public LocalDate dateProbation;
-    @Column(name = "probation_days")
-    public int probationDays;
-    @Column(name = "extra_days")
-    public int extraDays;
-
-    public Adopter(Long id, Long userId, Pet pet, boolean isProbation_checked, LocalDate dateProbation, int probationDays, int extraDays) {
-        this.id = id;
-        this.userId = userId;
-        this.pet = pet;
-        this.isProbation_checked = isProbation_checked;
-        this.dateProbation = dateProbation;
-        this.probationDays = probationDays;
-        this.extraDays = extraDays;
-    }
+    private boolean isProbationChecked;
+    @Column(name = "start_date_probation")
+    private Date startDateProbation;
+    @Column(name = "finish_date_probation")
+    private Date finishDateProbation;
 
     public Adopter() {
+    }
+
+    public Adopter(Long id, Long userId, Long petId, boolean isProbationChecked, Date startDateProbation, Date finishDateProbation) {
+        this.id = id;
+        this.userId = userId;
+        this.petId = petId;
+        this.isProbationChecked = isProbationChecked;
+        this.startDateProbation = startDateProbation;
+        this.finishDateProbation = finishDateProbation;
     }
 
     public Long getId() {
@@ -73,44 +66,36 @@ public class Adopter {
         this.userId = userId;
     }
 
-    public Pet getPet() {
-        return pet;
+    public Long getPetId() {
+        return petId;
     }
 
-    public void setPet(Pet pet) {
-        this.pet = pet;
+    public void setPetId(Long petId) {
+        this.petId = petId;
     }
 
-    public boolean isProbation_checked() {
-        return isProbation_checked;
+    public boolean isProbationChecked() {
+        return isProbationChecked;
     }
 
-    public void setProbation_checked(boolean probation_checked) {
-        isProbation_checked = probation_checked;
+    public void setProbationChecked(boolean probationChecked) {
+        isProbationChecked = probationChecked;
     }
 
-    public LocalDate getDateProbation() {
-        return dateProbation;
+    public Date getStartDateProbation() {
+        return startDateProbation;
     }
 
-    public void setDateProbation(LocalDate dateProbation) {
-        this.dateProbation = dateProbation;
+    public void setStartDateProbation(Date startDateProbation) {
+        this.startDateProbation = startDateProbation;
     }
 
-    public int getProbationDays() {
-        return probationDays;
+    public Date getFinishDateProbation() {
+        return finishDateProbation;
     }
 
-    public void setProbationDays(int probationDays) {
-        this.probationDays = probationDays;
-    }
-
-    public int getExtraDays() {
-        return extraDays;
-    }
-
-    public void setExtraDays(int extraDays) {
-        this.extraDays = extraDays;
+    public void setFinishDateProbation(Date finishDateProbation) {
+        this.finishDateProbation = finishDateProbation;
     }
 
     @Override
@@ -118,39 +103,10 @@ public class Adopter {
         return "Adopter{" +
                 "id=" + id +
                 ", userId=" + userId +
-                ", pet=" + pet +
-                ", isProbation_checked=" + isProbation_checked +
-                ", dateProbation=" + dateProbation +
-                ", probationDays=" + probationDays +
-                ", extraDays=" + extraDays +
+                ", petId=" + petId +
+                ", isProbationChecked=" + isProbationChecked +
+                ", startDateProbation=" + startDateProbation +
+                ", finishDateProbation=" + finishDateProbation +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Adopter adopter = (Adopter) o;
-
-        if (isProbation_checked != adopter.isProbation_checked) return false;
-        if (probationDays != adopter.probationDays) return false;
-        if (extraDays != adopter.extraDays) return false;
-        if (id != null ? !id.equals(adopter.id) : adopter.id != null) return false;
-        if (userId != null ? !userId.equals(adopter.userId) : adopter.userId != null) return false;
-        if (pet != null ? !pet.equals(adopter.pet) : adopter.pet != null) return false;
-        return dateProbation != null ? dateProbation.equals(adopter.dateProbation) : adopter.dateProbation == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (userId != null ? userId.hashCode() : 0);
-        result = 31 * result + (pet != null ? pet.hashCode() : 0);
-        result = 31 * result + (isProbation_checked ? 1 : 0);
-        result = 31 * result + (dateProbation != null ? dateProbation.hashCode() : 0);
-        result = 31 * result + probationDays;
-        result = 31 * result + extraDays;
-        return result;
     }
 }

@@ -8,7 +8,7 @@ import pro.sky.bot.service.PetService;
 import java.util.Collection;
 
 /**
- * Контроллер для работы с животными
+ * <b>PetsController</b> - controller of pets.<br/>
  */
 @RestController
 @RequestMapping("/pets")
@@ -20,21 +20,38 @@ public class PetController {
         this.petService = petService;
     }
 
+    /**
+     * POST http://localhost:8080
+     * create a record
+     */
     @PostMapping
     ResponseEntity<Pet> add(@RequestBody Pet pet) {
         return ResponseEntity.ok(petService.add(pet));
     }
 
+    /**
+     * GET http://localhost:8080/pets/all
+     * general reference request for pets
+     * show all pets
+     */
     @GetMapping("/all")
     ResponseEntity<Collection<Pet>> getAll() {
         return ResponseEntity.ok(petService.getAll());
     }
 
+    /**
+     * GET http://localhost:8080/pets
+     * get record by name
+     */
     @GetMapping("/{name}")
     ResponseEntity<Pet> getPet(@PathVariable String name) {
         return ResponseEntity.ok(petService.getPet(name));
     }
 
+    /**
+     * DELETE  http://localhost:8080/pets
+     * Delete by id
+     */
     @DeleteMapping("/{id}")
     ResponseEntity removePet(@PathVariable Long id) {
         petService.removePet(id);

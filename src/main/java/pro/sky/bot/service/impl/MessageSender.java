@@ -5,10 +5,8 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 public class MessageSender {
 
@@ -17,7 +15,8 @@ public class MessageSender {
 
     /**
      * Send text message to user
-     * @param chatId chat identifier in telegram
+     *
+     * @param chatId  chat identifier in telegram
      * @param message text message for user
      * @return telegram SendMessage object
      */
@@ -31,8 +30,9 @@ public class MessageSender {
 
     /**
      * Send text message to user and show keyboard
-     * @param chatId chat identifier in telegram
-     * @param message text message for user
+     *
+     * @param chatId   chat identifier in telegram
+     * @param message  text message for user
      * @param keyboard keyboard object to show
      * @return telegram SendMessage object
      */
@@ -42,28 +42,43 @@ public class MessageSender {
                 .replyMarkup(keyboard);
     }
 
+    /**
+     * Send message about mistakes
+     *
+     * @param chatId chat is in bot
+     * @return send message about mistakes
+     */
     protected SendMessage sendDefaultMessage(Long chatId) {
 
         String message = "Sorry, try again!";
         return sendMessage(chatId, message);
     }
 
-    protected SendMessage sendMessageFromTextFile(Long chatId, String fileName) throws IOException {
+    /**
+     * Send message from text file
+     *
+     * @param chatId   chat id in bot
+     * @param fileName name of file
+     * @return send message about file
+     */
+
+    protected SendMessage sendMessageFromTextFile(Long chatId, String fileName) {
 
         String path = textFilesDirectory.concat(fileName);
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
+        StringBuilder sb = new StringBuilder();
 
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
+        try {
+            File text = new File(path);
+            Scanner reader = new Scanner(text);
+            while (reader.hasNextLine()) {
+                sb.append(reader.nextLine());
             }
-            return sendMessage(chatId, sb.toString());
-        } finally {
-            br.close();
+            reader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
+
+        return sendMessage(chatId, sb.toString());
     }
 }
