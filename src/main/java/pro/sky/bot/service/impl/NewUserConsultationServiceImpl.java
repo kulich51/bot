@@ -11,7 +11,6 @@ import pro.sky.bot.model.*;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.ConsultationService;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -138,11 +137,7 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
      */
     public SendMessage getRulesMessage(Long chatId) {
 
-        try {
-            return sendMessageFromTextFile(chatId, RULES_FILE_NAME);
-        } catch (IOException e) {
-            return sendMessage(chatId, "Непредвиденная ошибка");
-        }
+        return sendMessage(chatId, "Непредвиденная ошибка");
     }
 
     /**

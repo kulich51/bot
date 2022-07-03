@@ -2,6 +2,7 @@ package pro.sky.bot.service.impl;
 
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
+import pro.sky.bot.enums.Pets;
 import pro.sky.bot.keyboard.ReportKeyboard;
 import pro.sky.bot.model.Volunteer;
 import pro.sky.bot.repository.VolunteerRepository;

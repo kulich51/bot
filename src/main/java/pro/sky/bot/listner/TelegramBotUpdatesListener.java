@@ -13,10 +13,7 @@ import com.pengrad.telegrambot.response.GetFileResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import pro.sky.bot.keyboard.AdopterConsultationKeyboard;
-import pro.sky.bot.keyboard.InfoKeyboard;
-import pro.sky.bot.keyboard.ReportKeyboard;
-import pro.sky.bot.keyboard.StartMenuKeyboard;
+import pro.sky.bot.keyboard.*;
 import pro.sky.bot.model.Adopter;
 import pro.sky.bot.enums.Pets;
 import pro.sky.bot.model.Pet;
@@ -394,6 +391,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 telegramBot.execute(reportService.getReportForm(chatId));
                 break;
             case (StartMenuKeyboard.TAKE_PET_BUTTON):
+            case (DogRecommendationsKeyboard.EXIT):
+            case (CatRecommendationsKeyboard.EXIT):
                 telegramBot.execute(adopterConsultationService.getKeyboard(chatId));
                 break;
             case (AdopterConsultationKeyboard.RULES_OF_ACQUAINTANCE):
@@ -404,6 +403,24 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 break;
             case (AdopterConsultationKeyboard.TRANSPORT_RECOMMENDATIONS):
                 telegramBot.execute(adopterConsultationService.getTransportRecommendations(chatId, selectedPet));
+                break;
+            case (AdopterConsultationKeyboard.HOME_IMPROVEMENT_RECOMMENDATIONS):
+                telegramBot.execute(adopterConsultationService.getHomeImprovementRecommendations(chatId, selectedPet));
+                break;
+            case (AdopterConsultationKeyboard.REASONS_OF_REFUSAL):
+                telegramBot.execute(adopterConsultationService.getReasonsOfRefusal(chatId));
+                break;
+            case (DogRecommendationsKeyboard.YOUNG_RECOMMENDATION):
+            case (CatRecommendationsKeyboard.YOUNG_RECOMMENDATION):
+                telegramBot.execute(adopterConsultationService.getRecommendationYoungPet(chatId, selectedPet));
+                break;
+            case (DogRecommendationsKeyboard.ADULT_RECOMMENDATION):
+            case (CatRecommendationsKeyboard.ADULT_RECOMMENDATION):
+                telegramBot.execute(adopterConsultationService.getRecommendationAdultPet(chatId, selectedPet));
+                break;
+            case (DogRecommendationsKeyboard.DISABILITY_RECOMMENDATION):
+            case (CatRecommendationsKeyboard.DISABILITY_RECOMMENDATION):
+                telegramBot.execute(adopterConsultationService.getRecommendationDisabilityPet(chatId, selectedPet));
                 break;
             default:
                 telegramBot.execute(sendTextMessage(chatId, "Sorry. Try again"));

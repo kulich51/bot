@@ -5,15 +5,13 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.enums.Pets;
 import pro.sky.bot.keyboard.AdopterConsultationKeyboard;
-import pro.sky.bot.model.Pet;
+import pro.sky.bot.keyboard.CatRecommendationsKeyboard;
+import pro.sky.bot.keyboard.DogRecommendationsKeyboard;
 import pro.sky.bot.model.Volunteer;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.ConsultationService;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Scanner;
 
 @Service
 public class AdopterConsultationServiceImpl extends MessageSender implements ConsultationService {
@@ -62,8 +60,8 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
     public SendMessage getRulesOfAcquaintance(Long chatId, Pets pet) {
 
         String fileName = "rules of acquaintance.txt";
-        String message = readFile(getPath(pet).concat(fileName));
-        return sendMessage(chatId, message);
+        String filePath = getPath(pet) + fileName;
+        return sendMessageFromTextFile(chatId, filePath);
     }
 
     /**
@@ -79,11 +77,80 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
         return sendMessage(chatId, message);
     }
 
+    /**
+     * Get recommendations about pet transportation
+     * @param chatId chat identifier
+     * @param pet pet kind (DOG or CAT)
+     * @return SendMessage with recommendations about pet transportation in text
+     */
     public SendMessage getTransportRecommendations(Long chatId, Pets pet) {
 
         String fileName = "transport_recommendations.txt";
-        String message = readFile(getPath(pet).concat(fileName));
-        return sendMessage(chatId, message);
+        String filePath = getPath(pet) + fileName;
+        return sendMessageFromTextFile(chatId, filePath);
+    }
+
+    /**
+     * Get keyboard with recommendations for home improvement
+     * @param chatId chat identifier
+     * @param pet pet kind (DOG or CAT)
+     * @return SenMessage with keyboard
+     */
+    public SendMessage getHomeImprovementRecommendations(Long chatId, Pets pet) {
+
+        Keyboard keyboard = getRecommendationKeyboard(pet);
+        String message = "Выберите рекомендации из списка ниже";
+        return sendMessage(chatId, message, keyboard);
+    }
+
+    /**
+     * Get text recommendations for young pet
+     * @param chatId chat identifier
+     * @param pet pet kind (DOG or CAT)
+     * @return SendMessage with recommendations for young pet in text
+     */
+    public SendMessage getRecommendationYoungPet(Long chatId, Pets pet) {
+
+        String fileName = "young_home_improvement.txt";
+        String filePath = getPath(pet) + fileName;
+        return sendMessageFromTextFile(chatId, filePath);
+    }
+
+    /**
+     * Get text recommendations for adult pet
+     * @param chatId chat identifier
+     * @param pet pet kind (DOG or CAT)
+     * @return SendMessage with recommendations for adult pet in text
+     */
+    public SendMessage getRecommendationAdultPet(Long chatId, Pets pet) {
+
+        String fileName = "adult_home_improvement.txt";
+        String filePath = getPath(pet) + fileName;
+        return sendMessageFromTextFile(chatId, filePath);
+    }
+
+    /**
+     * Get text recommendations for disability pet
+     * @param chatId chat identifier
+     * @param pet pet kind (DOG or CAT)
+     * @return SendMessage with recommendations for disability pet in text
+     */
+    public SendMessage getRecommendationDisabilityPet(Long chatId, Pets pet) {
+
+        String fileName = "disability_home_improvement.txt";
+        String filePath = getPath(pet) + fileName;
+        return sendMessageFromTextFile(chatId, filePath);
+    }
+
+    /**
+     * Get text reasons of refusal
+     * @param chatId chat identifier
+     * @return SendMessage with reasons of refusal in text
+     */
+    public SendMessage getReasonsOfRefusal(Long chatId) {
+
+        String filePath = "common/reasons_of_refusal.txt";
+        return sendMessageFromTextFile(chatId, filePath);
     }
 
     /**
@@ -103,27 +170,16 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
      */
     private String getPath(Pets pet) {
         if (pet.equals(Pets.DOG)) {
-            return "src/main/resources/text/dog/";
+            return "dog/";
         }
-        return "src/main/resources/text/cat/";
+        return "cat/";
     }
 
-    private String readFile(String filePath) {
+    private Keyboard getRecommendationKeyboard(Pets pet) {
 
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            File text = new File(filePath);
-            Scanner reader = new Scanner(text);
-            while (reader.hasNextLine()) {
-                sb.append(reader.nextLine());
-            }
-            reader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+        if (pet.equals(Pets.DOG)) {
+            return DogRecommendationsKeyboard.keyboard();
         }
-
-        return sb.toString();
+        return CatRecommendationsKeyboard.keyboard();
     }
 }

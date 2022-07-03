@@ -5,10 +5,8 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 public class MessageSender {
 
@@ -48,22 +46,23 @@ public class MessageSender {
         return sendMessage(chatId, message);
     }
 
-    protected SendMessage sendMessageFromTextFile(Long chatId, String fileName) throws IOException {
+    protected SendMessage sendMessageFromTextFile(Long chatId, String fileName) {
 
         String path = textFilesDirectory.concat(fileName);
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
+        StringBuilder sb = new StringBuilder();
 
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
+        try {
+            File text = new File(path);
+            Scanner reader = new Scanner(text);
+            while (reader.hasNextLine()) {
+                sb.append(reader.nextLine());
             }
-            return sendMessage(chatId, sb.toString());
-        } finally {
-            br.close();
+            reader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
+
+        return sendMessage(chatId, sb.toString());
     }
 }
