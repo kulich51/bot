@@ -56,9 +56,15 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
         String fileName = "rules of acquaintance.txt";
         String message = readFile(getPath(pet).concat(fileName));
+        return sendMessage(chatId, message);
+    }
+
+    public SendMessage getListOfDocuments(Long chatId) {
+
+        String message = "Чтобы взять животное из приюта необходим паспорт.\n" +
+                "В день взятия животного из приюта заключается договор о передаче животного";
 
         return sendMessage(chatId, message);
-
     }
 
     /**

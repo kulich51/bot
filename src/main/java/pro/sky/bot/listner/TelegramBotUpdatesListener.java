@@ -75,7 +75,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     /**
-     * Update process ( new message from user)
+     * Update process (new message from user)
      *
      * @param updates new message
      * @return CONFIRMED_UPDATES_ALL
@@ -398,6 +398,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 break;
             case (AdopterConsultationKeyboard.RULES_OF_ACQUAINTANCE):
                 telegramBot.execute(adopterConsultationService.getRulesOfAcquaintance(chatId, selectedPet));
+                break;
+            case (AdopterConsultationKeyboard.LIST_OF_DOCUMENTS):
+                telegramBot.execute(adopterConsultationService.getListOfDocuments(chatId));
                 break;
             default:
                 telegramBot.execute(sendTextMessage(chatId, "Sorry. Try again"));
