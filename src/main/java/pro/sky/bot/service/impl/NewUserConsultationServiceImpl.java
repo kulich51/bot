@@ -137,7 +137,8 @@ public class NewUserConsultationServiceImpl extends MessageSender implements Con
      */
     public SendMessage getRulesMessage(Long chatId) {
 
-        return sendMessage(chatId, "Непредвиденная ошибка");
+        String rulesPath = "common/rules.txt";
+        return sendMessageFromTextFile(chatId, rulesPath);
     }
 
     /**
