@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pro.sky.bot.model.Adopter;
 import pro.sky.bot.model.Photo;
 import pro.sky.bot.model.Report;
 import pro.sky.bot.service.ReportService;

@@ -2,7 +2,6 @@ package pro.sky.bot.service.impl;
 
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
-import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.keyboard.StartMenuKeyboard;
 import pro.sky.bot.service.GreetingService;
 
