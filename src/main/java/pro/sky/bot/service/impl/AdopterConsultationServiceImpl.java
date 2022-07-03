@@ -5,6 +5,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.enums.Pets;
 import pro.sky.bot.keyboard.AdopterConsultationKeyboard;
+import pro.sky.bot.model.Pet;
 import pro.sky.bot.model.Volunteer;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.ConsultationService;
@@ -52,6 +53,12 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
         return sendMessage(chatId, message);
     }
 
+    /**
+     * Get rules of acquaintance depending on pet type
+     * @param chatId chat identifier
+     * @param pet pet type (DOG or CAT)
+     * @return SenMessage object information about acquaintance
+     */
     public SendMessage getRulesOfAcquaintance(Long chatId, Pets pet) {
 
         String fileName = "rules of acquaintance.txt";
@@ -59,11 +66,23 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
         return sendMessage(chatId, message);
     }
 
+    /**
+     * Get necessary list of documents (common for pets and dogs)
+     * @param chatId chat identifier
+     * @return SenMessage with list of documents in text
+     */
     public SendMessage getListOfDocuments(Long chatId) {
 
         String message = "Чтобы взять животное из приюта необходим паспорт.\n" +
                 "В день взятия животного из приюта заключается договор о передаче животного";
 
+        return sendMessage(chatId, message);
+    }
+
+    public SendMessage getTransportRecommendations(Long chatId, Pets pet) {
+
+        String fileName = "transport_recommendations.txt";
+        String message = readFile(getPath(pet).concat(fileName));
         return sendMessage(chatId, message);
     }
 

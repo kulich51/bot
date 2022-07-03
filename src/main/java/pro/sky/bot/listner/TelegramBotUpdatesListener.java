@@ -402,6 +402,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             case (AdopterConsultationKeyboard.LIST_OF_DOCUMENTS):
                 telegramBot.execute(adopterConsultationService.getListOfDocuments(chatId));
                 break;
+            case (AdopterConsultationKeyboard.TRANSPORT_RECOMMENDATIONS):
+                telegramBot.execute(adopterConsultationService.getTransportRecommendations(chatId, selectedPet));
+                break;
             default:
                 telegramBot.execute(sendTextMessage(chatId, "Sorry. Try again"));
         }
