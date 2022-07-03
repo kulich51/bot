@@ -23,23 +23,20 @@ public class Adopter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
     @Column(name = "user_id")
-    public Long userId;
+    private Long userId;
 
-//    @OneToOne (cascade = CascadeType.ALL)
-//    @JoinColumn (name = "pet_id", referencedColumnName = "id")
-//    public Pet pet;
     @Column(name = "pet_id")
-    public Long petId;
+    private Long petId;
 
     @Column(name = "is_probation_checked")
-    public boolean isProbationChecked;
+    private boolean isProbationChecked;
     @Column(name = "start_date_probation")
-    public Date startDateProbation;
+    private Date startDateProbation;
     @Column(name = "finish_date_probation")
-    public Date finishDateProbation;
+    private Date finishDateProbation;
 
     public Adopter() {
     }
