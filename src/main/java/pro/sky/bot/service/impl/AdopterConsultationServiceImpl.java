@@ -5,15 +5,12 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.stereotype.Service;
 import pro.sky.bot.enums.Pets;
 import pro.sky.bot.keyboard.AdopterConsultationKeyboard;
-import pro.sky.bot.keyboard.InfoKeyboard;
-import pro.sky.bot.model.CatShelter;
-import pro.sky.bot.model.DogShelter;
-import pro.sky.bot.model.Shelter;
 import pro.sky.bot.model.Volunteer;
 import pro.sky.bot.repository.VolunteerRepository;
 import pro.sky.bot.service.ConsultationService;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Scanner;
 
