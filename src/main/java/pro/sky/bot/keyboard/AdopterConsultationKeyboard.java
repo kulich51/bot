@@ -13,6 +13,7 @@ public class AdopterConsultationKeyboard {
     public static final String HOME_IMPROVEMENT_RECOMMENDATIONS = "Рекомендации по обустройству дома";
     public static final String REASONS_OF_REFUSAL = "Причины отказа в заборе животного";
     public static final String ADD_CONTACT_BUTTON = "Записать контакт";
+    public static final String EXIT_BUTTON = "В главное меню ";
 
     private AdopterConsultationKeyboard() {
     }
@@ -26,7 +27,8 @@ public class AdopterConsultationKeyboard {
                 .addRow(new KeyboardButton(TRANSPORT_RECOMMENDATIONS))
                 .addRow(new KeyboardButton(HOME_IMPROVEMENT_RECOMMENDATIONS))
                 .addRow(new KeyboardButton(REASONS_OF_REFUSAL))
-                .addRow(new KeyboardButton(ADD_CONTACT_BUTTON).requestContact(true));
+                .addRow(new KeyboardButton(ADD_CONTACT_BUTTON).requestContact(true))
+                .addRow(new KeyboardButton(EXIT_BUTTON));
 
         return keyboard;
     }

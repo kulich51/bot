@@ -382,6 +382,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 telegramBot.execute(newUserConsultationService.getVolunteerContact(chatId));
                 break;
             case (InfoKeyboard.EXIT_BUTTON):
+            case (AdopterConsultationKeyboard.EXIT_BUTTON):
+            case (ReportKeyboard.EXIT_BUTTON):
                 telegramBot.execute(greetingService.getStartMenu(chatId));
                 break;
             case (StartMenuKeyboard.SEND_REPORT_BUTTON):
