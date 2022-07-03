@@ -17,16 +17,33 @@ public class PetServiceImpl implements PetService {
         this.petRepository = petRepository;
     }
 
+    /**
+     * Add pets in the database
+     *
+     * @param pet object in shelter
+     * @return save pet in the database
+     */
     @Override
     public Pet add(Pet pet) {
         return petRepository.save(pet);
     }
 
+    /**
+     * Find all pets
+     *
+     * @return found pets in the database
+     */
     @Override
     public Collection<Pet> getAll() {
         return petRepository.findAll();
     }
 
+    /**
+     * Find pet by name
+     *
+     * @param name name of pet
+     * @return found pet
+     */
     @Override
     public Pet getPet(String name) {
         Pet pet = petRepository.getByName(name);
@@ -36,6 +53,11 @@ public class PetServiceImpl implements PetService {
         return pet;
     }
 
+    /**
+     * Delete pet by ID
+     *
+     * @param id pet ID in the database
+     */
     @Override
     public void removePet(Long id) {
         petRepository.deleteById(id);

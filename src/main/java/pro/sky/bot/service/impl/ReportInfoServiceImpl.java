@@ -18,12 +18,25 @@ public class ReportInfoServiceImpl extends MessageSender implements Consultation
         this.volunteerRepository = volunteerRepository;
     }
 
+    /**
+     * Send Message about report for adopter
+     *
+     * @param chatId chat ID in bot
+     * @return message about report
+     */
+
     @Override
     public SendMessage getKeyboard(Long chatId) {
         return sendMessage(chatId, "Можете отправить отчёт о питомце в любой момент.\n" +
                 "Дополнительная информация по кнопкам ниже", ReportKeyboard.reportKeyboard());
     }
 
+    /**
+     * Send message about the report form
+     *
+     * @param chatId chat ID in bot
+     * @return message about the report form
+     */
     public SendMessage getReportForm(Long chatId) {
 
         String message = "В ежедневный отчет входит следующая информация:\n" +
@@ -35,6 +48,12 @@ public class ReportInfoServiceImpl extends MessageSender implements Consultation
         return sendMessage(chatId, message);
     }
 
+    /**
+     * Get contact of volunteer by chat ID
+     *
+     * @param chatId chat ID in bot
+     * @return send contact of volunteer
+     */
     @Override
     public SendMessage getVolunteerContact(Long chatId) {
         List<Volunteer> volunteers = volunteerRepository.findAll();
@@ -42,6 +61,7 @@ public class ReportInfoServiceImpl extends MessageSender implements Consultation
         String message = "Обратитесь за помощью к " + random.getUsername();
         return sendMessage(chatId, message);
     }
+
 
     private int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);

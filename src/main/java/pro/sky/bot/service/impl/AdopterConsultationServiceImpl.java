@@ -27,6 +27,7 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get start keyboard for adopter consultation
+     *
      * @param chatId chat identifier
      * @return SenMessage object with keyboard
      */
@@ -39,6 +40,7 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get volunteer contact to text him
+     *
      * @param chatId chat identifier
      * @return SenMessage object with volunteer contact in message
      */
@@ -53,8 +55,9 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get rules of acquaintance depending on pet type
+     *
      * @param chatId chat identifier
-     * @param pet pet type (DOG or CAT)
+     * @param pet    pet type (DOG or CAT)
      * @return SenMessage object information about acquaintance
      */
     public SendMessage getRulesOfAcquaintance(Long chatId, Pets pet) {
@@ -66,6 +69,7 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get necessary list of documents (common for pets and dogs)
+     *
      * @param chatId chat identifier
      * @return SenMessage with list of documents in text
      */
@@ -79,8 +83,9 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get recommendations about pet transportation
+     *
      * @param chatId chat identifier
-     * @param pet pet kind (DOG or CAT)
+     * @param pet    pet kind (DOG or CAT)
      * @return SendMessage with recommendations about pet transportation in text
      */
     public SendMessage getTransportRecommendations(Long chatId, Pets pet) {
@@ -92,8 +97,9 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get keyboard with recommendations for home improvement
+     *
      * @param chatId chat identifier
-     * @param pet pet kind (DOG or CAT)
+     * @param pet    pet kind (DOG or CAT)
      * @return SenMessage with keyboard
      */
     public SendMessage getHomeImprovementRecommendations(Long chatId, Pets pet) {
@@ -105,8 +111,9 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get text recommendations for young pet
+     *
      * @param chatId chat identifier
-     * @param pet pet kind (DOG or CAT)
+     * @param pet    pet kind (DOG or CAT)
      * @return SendMessage with recommendations for young pet in text
      */
     public SendMessage getRecommendationYoungPet(Long chatId, Pets pet) {
@@ -118,8 +125,9 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get text recommendations for adult pet
+     *
      * @param chatId chat identifier
-     * @param pet pet kind (DOG or CAT)
+     * @param pet    pet kind (DOG or CAT)
      * @return SendMessage with recommendations for adult pet in text
      */
     public SendMessage getRecommendationAdultPet(Long chatId, Pets pet) {
@@ -131,8 +139,9 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get text recommendations for disability pet
+     *
      * @param chatId chat identifier
-     * @param pet pet kind (DOG or CAT)
+     * @param pet    pet kind (DOG or CAT)
      * @return SendMessage with recommendations for disability pet in text
      */
     public SendMessage getRecommendationDisabilityPet(Long chatId, Pets pet) {
@@ -144,6 +153,7 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get text reasons of refusal
+     *
      * @param chatId chat identifier
      * @return SendMessage with reasons of refusal in text
      */
@@ -155,6 +165,7 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get random number from interval
+     *
      * @param min min number
      * @param max max number
      * @return random number
@@ -165,6 +176,7 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
 
     /**
      * Get pet shelter
+     *
      * @param pet type of pet shelter from enum (cat or dog)
      * @return pet shelter
      */
@@ -175,6 +187,11 @@ public class AdopterConsultationServiceImpl extends MessageSender implements Con
         return "cat/";
     }
 
+    /**
+     * Get recommendation for adopters
+     * @param pet object of shelter
+     * @return cat or dog recommendations
+     */
     private Keyboard getRecommendationKeyboard(Pets pet) {
 
         if (pet.equals(Pets.DOG)) {

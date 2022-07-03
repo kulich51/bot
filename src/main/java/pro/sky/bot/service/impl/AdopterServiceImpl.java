@@ -35,6 +35,12 @@ public class AdopterServiceImpl implements AdopterService {
         this.petRepository = petRepository;
     }
 
+    /**
+     * Add and save object adopter in to the database
+     *
+     * @param adopter object adopter
+     * @return add to database
+     */
     @Override
     public Adopter add(Adopter adopter) {
 
@@ -49,6 +55,7 @@ public class AdopterServiceImpl implements AdopterService {
 
     /**
      * Get contact from db by userId and check it for null
+     *
      * @param userId user id
      */
     private void checkContactExist(Long userId) {
@@ -61,6 +68,7 @@ public class AdopterServiceImpl implements AdopterService {
 
     /**
      * Get pet from db by pet_id and check it for null
+     *
      * @param petId pet id
      */
     private void checkPetExist(Long petId) {
@@ -71,6 +79,12 @@ public class AdopterServiceImpl implements AdopterService {
         }
     }
 
+    /**
+     * Get adopter on probation
+     *
+     * @param onProbation who is appointed
+     * @return find all adopters on probation
+     */
     @Override
     public Collection<Adopter> getAdopters(Boolean onProbation) {
 
@@ -80,6 +94,12 @@ public class AdopterServiceImpl implements AdopterService {
         return adopterRepository.findAll();
     }
 
+    /**
+     * Get adopters by ID in to the database
+     *
+     * @param id adopter in bot
+     * @return found adopter
+     */
     @Override
     public Collection<Adopter> getAdopter(Long id) {
 
@@ -88,7 +108,16 @@ public class AdopterServiceImpl implements AdopterService {
         return adopter;
     }
 
+    /**
+     * Setting of probation for adopters
+     *
+     * @param adopter         adopters for pets
+     * @param acceptProbation if passed - true, otherwise false
+     * @param days            number of days of probation
+     * @return add adopter with probation to the database
+     */
     @Override
+
     public Adopter changeProbation(Adopter adopter, boolean acceptProbation, int days) {
 
         Adopter oldAdopter = getAdopterByUserIdAndPetId(adopter.getUserId(), adopter.getPetId());
@@ -97,6 +126,12 @@ public class AdopterServiceImpl implements AdopterService {
         return adopterRepository.save(oldAdopter);
     }
 
+    /**
+     * Change status of probation
+     *
+     * @param adopter         adopters for pets
+     * @param acceptProbation if passed - true, otherwise false
+     */
     private void changeProbationStatus(Adopter adopter, boolean acceptProbation) {
         if (acceptProbation) {
             Instant instant = Instant.now();
@@ -110,6 +145,13 @@ public class AdopterServiceImpl implements AdopterService {
             throw new ProbationPeriodNotEndException();
         }
     }
+
+    /**
+     * Extension of the probation for adopters on 14 or 30 days
+     *
+     * @param adopter adopters for pets
+     * @param days    number of days of probation
+     */
 
     private void changeProbationDate(Adopter adopter, int days) {
 
@@ -125,10 +167,23 @@ public class AdopterServiceImpl implements AdopterService {
         throw new InvalidProbationDaysCountException();
     }
 
+    /**
+     * Delete adopter by ID to the database
+     *
+     * @param id adopter in bot
+     */
+
     @Override
     public void removeAdopter(Long id) {
         adopterRepository.deleteById(id);
     }
+
+    /**
+     * Send message about probation
+     *
+     * @param userId adopter on probation
+     * @param days   number of days of probation
+     */
 
     private void sendMessage(Long userId, int days) {
 
@@ -137,6 +192,13 @@ public class AdopterServiceImpl implements AdopterService {
         telegramBot.execute(new SendMessage(contact.getChatId(), message));
     }
 
+    /**
+     * Find adopter by user ID or pet ID
+     *
+     * @param userId adopter on probation
+     * @param petId  adopted pet
+     * @return found adopter
+     */
     private Adopter getAdopterByUserIdAndPetId(Long userId, Long petId) {
 
         Adopter adopter = adopterRepository.getAdopterByUserIdAndPetId(userId, petId);
@@ -144,12 +206,24 @@ public class AdopterServiceImpl implements AdopterService {
         return adopter;
     }
 
+    /**
+     * Check Object not null
+     *
+     * @param adopter adopters for pets
+     */
     private void checkObjectNotNull(Object adopter) {
         if (adopter == null) {
             throw new AdopterNotFoundException();
         }
     }
 
+    /**
+     * Get the end date of probation
+     *
+     * @param startDate start date of probation
+     * @param days      number of days of probation
+     * @return add days in probation
+     */
     Date getFinishDate(Date startDate, int days) {
 
         return DateUtils.addDays(startDate, days);

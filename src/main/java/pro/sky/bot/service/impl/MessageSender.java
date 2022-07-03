@@ -15,7 +15,8 @@ public class MessageSender {
 
     /**
      * Send text message to user
-     * @param chatId chat identifier in telegram
+     *
+     * @param chatId  chat identifier in telegram
      * @param message text message for user
      * @return telegram SendMessage object
      */
@@ -29,8 +30,9 @@ public class MessageSender {
 
     /**
      * Send text message to user and show keyboard
-     * @param chatId chat identifier in telegram
-     * @param message text message for user
+     *
+     * @param chatId   chat identifier in telegram
+     * @param message  text message for user
      * @param keyboard keyboard object to show
      * @return telegram SendMessage object
      */
@@ -40,11 +42,25 @@ public class MessageSender {
                 .replyMarkup(keyboard);
     }
 
+    /**
+     * Send message about mistakes
+     *
+     * @param chatId chat is in bot
+     * @return send message about mistakes
+     */
     protected SendMessage sendDefaultMessage(Long chatId) {
 
         String message = "Sorry, try again!";
         return sendMessage(chatId, message);
     }
+
+    /**
+     * Send message from text file
+     *
+     * @param chatId   chat id in bot
+     * @param fileName name of file
+     * @return send message about file
+     */
 
     protected SendMessage sendMessageFromTextFile(Long chatId, String fileName) {
 

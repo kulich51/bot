@@ -37,12 +37,27 @@ public class ReportServiceImpl implements ReportService {
             "не так подробно, как необходимо. Пожалуйста, подойди ответственнее к этому занятию. " +
             "В противном случае, волонтеры приюта будут обязаны самолично проверять условия содержания животного";
 
+    /**
+     * Get reports by name of pet
+     *
+     * @param petName name of pet
+     * @return report about pet
+     */
     @Override
     public Collection<Report> getReportsByPet(String petName) {
 
         ReportProjection reports = getPetReports(petName);
         return reports.getReports();
     }
+
+    /**
+     * Get report about pet by pet name and ID
+     *
+     * @param petName  name of pet
+     * @param reportId report id
+     * @param accept   accept report
+     * @return report about pet
+     */
 
     @Override
     public Report getReportByPetNameAndId(String petName, Long reportId, Boolean accept) {
@@ -58,12 +73,23 @@ public class ReportServiceImpl implements ReportService {
         return report;
     }
 
+    /**
+     * Send message to adopter about report
+     *
+     * @param userId user ID
+     */
     private void sendMessageToAdopter(Long userId) {
 
         Contact contact = contactRepository.findByUserId(userId);
         telegramBot.execute(new SendMessage(contact.getChatId(), REPORT_NOT_ACCEPTED));
     }
 
+    /**
+     * Get report about pet
+     *
+     * @param petName name of pet
+     * @return report of pet
+     */
     private ReportProjection getPetReports(String petName) {
 
         ReportProjection reports = petRepository.findAllByName(petName);
@@ -72,6 +98,14 @@ public class ReportServiceImpl implements ReportService {
         }
         return reports;
     }
+
+    /**
+     * Get report by report ID
+     *
+     * @param reportId report ID
+     * @param reports  all reports
+     * @return found report
+     */
 
     private Report getReportById(Long reportId, Collection<Report> reports) {
 
@@ -84,6 +118,13 @@ public class ReportServiceImpl implements ReportService {
         return adopterReport;
     }
 
+    /**
+     * Get photo of reports
+     *
+     * @param petName  name of pet
+     * @param reportId report ID
+     * @return found photo of report
+     */
     @Override
     public Photo getReportPhoto(String petName, Long reportId) {
 
@@ -98,6 +139,7 @@ public class ReportServiceImpl implements ReportService {
         Photo photo = new Photo(result.getBody(), parseMediaType(report.getFilePath()));
         return photo;
     }
+
 
     private String parseMediaType(String url) {
 
