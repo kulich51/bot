@@ -12,6 +12,9 @@ import pro.sky.bot.service.ReportService;
 
 import java.util.Collection;
 
+/**
+ * <b>ReportController</b> - controller of reports.<br/>
+ */
 @RestController
 @RequestMapping("reports")
 public class ReportController {
@@ -22,20 +25,32 @@ public class ReportController {
         this.reportService = reportService;
     }
 
+    /**
+     * GET http://localhost:8080/reports
+     * get record by pet name
+     */
     @GetMapping("{petName}")
     ResponseEntity<Collection<Report>> getReportsByPet(@PathVariable String petName) {
 
         return ResponseEntity.ok(reportService.getReportsByPet(petName));
     }
 
+    /**
+     * GET http://localhost:8080/reports
+     * get record by pet name / report ID
+     */
     @GetMapping("{petName}/{reportId}")
     ResponseEntity<Report> getReportByPetNameAndId(@PathVariable String petName,
                                                    @PathVariable Long reportId,
-                                                   @RequestParam (defaultValue = "true") Boolean accept) {
+                                                   @RequestParam(defaultValue = "true") Boolean accept) {
 
         return ResponseEntity.ok(reportService.getReportByPetNameAndId(petName, reportId, accept));
     }
 
+    /**
+     * GET http://localhost:8080/reports
+     * get record by pet name / report ID / photo
+     */
     @GetMapping("{petName}/{reportId}/photo")
     ResponseEntity<byte[]> getReportPhoto(@PathVariable String petName,
                                           @PathVariable Long reportId) {

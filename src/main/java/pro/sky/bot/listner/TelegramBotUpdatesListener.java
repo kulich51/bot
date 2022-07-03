@@ -74,6 +74,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         telegramBot.setUpdatesListener(this);
     }
 
+    /**
+     * Update process ( new message from user)
+     *
+     * @param updates new message
+     * @return CONFIRMED_UPDATES_ALL
+     */
     @Override
     public int process(List<Update> updates) {
         updates.forEach(update -> {
@@ -97,6 +103,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     /**
      * Save adopter report (photo with text) in repository
+     *
      * @param update user's message
      * @return true if user sent photo, otherwise false
      */
@@ -145,7 +152,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     date,
                     textReport,
                     true
-                );
+            );
 
             // Если отчет по питомцу есть в БД, то обновляем его на новый
             if (oldReport != null) {
@@ -160,6 +167,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return false;
     }
 
+    /**
+     * Update reports and save it to the database
+     *
+     * @param oldReport in database
+     * @param report    new report
+     */
     private void updateReport(Report oldReport, Report report) {
 
         oldReport.setAccepted(false);
@@ -171,8 +184,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     /**
      * Check caption of report by null
+     *
      * @param message user message via bot
-     * @param chatId chat id in bot
+     * @param chatId  chat id in bot
      * @return true if caption is null, otherwise false
      */
     private boolean checkReportCaption(Message message, Long chatId) {
@@ -180,8 +194,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         if (message.caption() == null) {
             telegramBot.execute(
                     sendTextMessage(
-                    chatId,
-                    "Пришлите отчёт заново. К фотографиии необходимо приложить отчёт согласно форме"
+                            chatId,
+                            "Пришлите отчёт заново. К фотографиии необходимо приложить отчёт согласно форме"
                     )
             );
             return true;
@@ -191,9 +205,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     /**
      * Check what pet object not null
-     * @param pet pet object
+     *
+     * @param pet     pet object
      * @param petName pet name to find in repository
-     * @param chatId chat id in bot
+     * @param chatId  chat id in bot
      * @return true if pet is null (not found), otherwise false
      */
     private boolean checkPet(Pet pet, String petName, Long chatId) {
@@ -201,8 +216,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         if (pet == null) {
             telegramBot.execute(
                     sendTextMessage(
-                    chatId,
-                    "Животное с кличкой '" + petName + "' не найдено. Повторите снова"
+                            chatId,
+                            "Животное с кличкой '" + petName + "' не найдено. Повторите снова"
                     )
             );
             return true;
@@ -211,10 +226,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     /**
+     * Adopter verification
      *
-     * @param message
-     * @param pet
-     * @return
+     * @param message user message via bot
+     * @param pet     pet object
+     * @return true if not an adopter, otherwise false
      */
     private boolean checkAdopter(Message message, Pet pet) {
 
@@ -235,6 +251,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     /**
      * Get File object from bot with report photo
+     *
      * @param update user's message
      * @return File object
      */
@@ -247,6 +264,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     /**
      * Get date of a message from unix timestamp
+     *
      * @param update user's message
      * @return date of a message
      */
@@ -258,6 +276,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     /**
      * Get pet name from users' message (first row from message)
+     *
      * @param update user's message
      * @return pet name
      */
@@ -273,6 +292,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     /**
      * Get report from users' message (first row from message)
+     *
      * @param update user's message
      * @return text report about pet
      */
@@ -287,6 +307,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return String.join("\n", report);
     }
 
+    /**
+     * Add contact in to the database
+     *
+     * @param update user's message
+     * @return true if pet is added, otherwise false
+     */
     private boolean addContact(Update update) {
 
         Contact tgContact = update.message().contact();
@@ -299,6 +325,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         return false;
     }
 
+    /**
+     * Create contacts for database
+     *
+     * @param contact contacts of a potential adopter ( pass via telegram )
+     * @param chatId  chat id in bot
+     * @return new entity for database
+     */
     private pro.sky.bot.model.Contact createDatabaseContact(Contact contact, Long chatId) {
         return new pro.sky.bot.model.Contact(
                 contact.userId(),
@@ -309,6 +342,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         );
     }
 
+    /**
+     * Update process ( new message from user)
+     *
+     * @param update new message
+     */
     private void processUpdate(Update update) {
         Long chatId = update.message().chat().id();
         String userMessage = update.message().text();
@@ -317,11 +355,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             case ("/start"):
                 telegramBot.execute(greetingService.greeting(chatId));
                 break;
-            case("/dogs"):
+            case ("/dogs"):
                 selectedPet = Pets.DOG;
                 telegramBot.execute(greetingService.getStartMenu(chatId));
                 break;
-            case("/cats"):
+            case ("/cats"):
                 selectedPet = Pets.CAT;
                 telegramBot.execute(greetingService.getStartMenu(chatId));
                 break;
@@ -366,6 +404,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         }
     }
 
+    /**
+     * Send message in bot
+     *
+     * @param message user message via bot
+     * @param chatId  chat id in bot
+     * @return new message
+     */
     private SendMessage sendTextMessage(Long chatId, String message) {
 
         return new SendMessage(chatId, message)
