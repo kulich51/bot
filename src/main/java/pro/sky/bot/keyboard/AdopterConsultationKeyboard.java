@@ -4,19 +4,17 @@ import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 
-import java.security.Key;
+public class AdopterConsultationKeyboard {
 
-public class PotentialHostConsultationKeyboard {
-
-    public static final String RULES_OF_ACQUAINTANCE = "Правила знакомства с собакой";
+    public static final String RULES_OF_ACQUAINTANCE = "Правила знакомства с животным";
     public static final String RECOMMENDATIONS = "Рекомендации";
     public static final String CYNOLOGIST = "Информация по кинологам";
     public static final String LIST_OF_DOCUMENTS = "Необходимый перечень документов";
 
-    private PotentialHostConsultationKeyboard() {
+    private AdopterConsultationKeyboard() {
     }
 
-    public static Keyboard potentialHostConsultationKeyboard() {
+    public static Keyboard adopterConsultationKeyboard() {
 
         Keyboard keyboard = new ReplyKeyboardMarkup(
                 new KeyboardButton(RULES_OF_ACQUAINTANCE)

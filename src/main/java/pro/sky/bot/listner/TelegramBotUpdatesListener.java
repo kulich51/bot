@@ -13,6 +13,7 @@ import com.pengrad.telegrambot.response.GetFileResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import pro.sky.bot.keyboard.AdopterConsultationKeyboard;
 import pro.sky.bot.keyboard.InfoKeyboard;
 import pro.sky.bot.keyboard.ReportKeyboard;
 import pro.sky.bot.keyboard.StartMenuKeyboard;
@@ -26,7 +27,7 @@ import pro.sky.bot.repository.PetRepository;
 import pro.sky.bot.repository.ReportRepository;
 import pro.sky.bot.service.impl.GreetingServiceImpl;
 import pro.sky.bot.service.impl.NewUserConsultationServiceImpl;
-import pro.sky.bot.service.impl.PotentialHostConsultationServiceImpl;
+import pro.sky.bot.service.impl.AdopterConsultationServiceImpl;
 import pro.sky.bot.service.impl.ReportInfoServiceImpl;
 
 import javax.annotation.PostConstruct;
@@ -43,7 +44,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final NewUserConsultationServiceImpl newUserConsultationService;
     private final ReportInfoServiceImpl reportService;
-    private final PotentialHostConsultationServiceImpl potentialHostConsultationService;
+    private final AdopterConsultationServiceImpl adopterConsultationService;
     private final GreetingServiceImpl greetingService;
     private final ContactRepository contactRepository;
     private final PetRepository petRepository;
@@ -55,12 +56,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public TelegramBotUpdatesListener(
             TelegramBot telegramBot,
             NewUserConsultationServiceImpl newUserConsultationService,
-            ReportInfoServiceImpl reportService, PotentialHostConsultationServiceImpl potentialHostConsultationService,
+            ReportInfoServiceImpl reportService, AdopterConsultationServiceImpl potentialHostConsultationService,
             GreetingServiceImpl greetingService, ContactRepository contactRepository, PetRepository petRepository, ReportRepository reportsRepository, AdopterRepository adopterRepository) {
         this.telegramBot = telegramBot;
         this.newUserConsultationService = newUserConsultationService;
         this.reportService = reportService;
-        this.potentialHostConsultationService = potentialHostConsultationService;
+        this.adopterConsultationService = potentialHostConsultationService;
         this.greetingService = greetingService;
         this.contactRepository = contactRepository;
         this.petRepository = petRepository;
@@ -345,11 +346,20 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             case (InfoKeyboard.CALL_VOLUNTEER_BUTTON):
                 telegramBot.execute(newUserConsultationService.getVolunteerContact(chatId));
                 break;
+            case (InfoKeyboard.EXIT_BUTTON):
+                telegramBot.execute(greetingService.getStartMenu(chatId));
+                break;
             case (StartMenuKeyboard.SEND_REPORT_BUTTON):
                 telegramBot.execute(reportService.getKeyboard(chatId));
                 break;
             case (ReportKeyboard.REPORT_FORM_BUTTON):
                 telegramBot.execute(reportService.getReportForm(chatId));
+                break;
+            case (StartMenuKeyboard.TAKE_PET_BUTTON):
+                telegramBot.execute(adopterConsultationService.getKeyboard(chatId));
+                break;
+            case (AdopterConsultationKeyboard.RULES_OF_ACQUAINTANCE):
+                telegramBot.execute(adopterConsultationService.getRulesOfAcquaintance(chatId, selectedPet));
                 break;
             default:
                 telegramBot.execute(sendTextMessage(chatId, "Sorry. Try again"));

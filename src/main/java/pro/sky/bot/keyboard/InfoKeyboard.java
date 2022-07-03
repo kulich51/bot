@@ -12,6 +12,7 @@ public class InfoKeyboard {
     public static final String RULES_BUTTON = "Техника безопасности на территории приюта";
     public static final String ADD_CONTACT_BUTTON = "Записать контакт";
     public static final String CALL_VOLUNTEER_BUTTON = "Позвать волонтёра";
+    public static final String EXIT_BUTTON = "Выход в предудыщее меню";
 
     private InfoKeyboard() {
     }
@@ -26,6 +27,7 @@ public class InfoKeyboard {
                 .addRow(new KeyboardButton(RULES_BUTTON))
                 .addRow(new KeyboardButton(ADD_CONTACT_BUTTON).requestContact(true))
                 .addRow(new KeyboardButton(CALL_VOLUNTEER_BUTTON))
+                .addRow(new KeyboardButton(EXIT_BUTTON))
                 .resizeKeyboard(true)
                 .oneTimeKeyboard(true)
                 .selective(true);
