@@ -13,8 +13,8 @@ import java.util.Date;
  * dateProbation - дата срока
  * probationDays - количество дней
  * extraDays     - доп дни
- * is_checked = true - весь испытательный срок
- * по окончанию is_checked = false
+ * is_probation_checked = true - весь испытательный срок
+ * по окончанию is_probation_checked = false
  * kind - вид животного
  */
 @Entity
